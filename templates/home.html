@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="animation: fadeInUp 0.8s ease;">
+    <h1>Bienvenido a StartPn Jr</h1>
+    <p>Aplicación web para integrar la metodología <strong>CRISP-ML</strong> con el proyecto StartPn Jr.</p>
+    <p>Selecciona una de las fases del menú superior o haz clic en las tarjetas a continuación para continuar.</p>
+    
+    <div class="phase-cards">
+        <div class="phase-card">
+            <h2>Fase 1</h2>
+            <p>Comprensión del negocio y exploración de datos</p>
+            <a href="{{ url_for('fase1') }}">Ir a Fase 1</a>
+        </div>
+        
+        <div class="phase-card">
+            <h2>Fase 2</h2>
+            <p>Preparación de datos y modelado</p>
+            <a href="{{ url_for('fase2') }}">Ir a Fase 2</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

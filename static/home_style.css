@@ -1,0 +1,372 @@
+:root {
+    --background: #f0f4ff;
+    --color: #2c3e50;
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --accent-color: #e74c3c;
+    --purple: #9b59b6;
+    --orange: #f39c12;
+    --navbar-bg: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background: var(--background);
+    color: var(--color);
+    min-height: 100vh;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Fondo animado con círculos */
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.circle-bg {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: float 20s infinite ease-in-out;
+}
+
+.circle-bg-1 {
+    width: 100px;
+    height: 100px;
+    background: var(--primary-color);
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 25s;
+}
+
+.circle-bg-2 {
+    width: 150px;
+    height: 150px;
+    background: var(--secondary-color);
+    top: 60%;
+    left: 80%;
+    animation-delay: 2s;
+    animation-duration: 20s;
+}
+
+.circle-bg-3 {
+    width: 80px;
+    height: 80px;
+    background: var(--accent-color);
+    top: 80%;
+    left: 20%;
+    animation-delay: 4s;
+    animation-duration: 22s;
+}
+
+.circle-bg-4 {
+    width: 120px;
+    height: 120px;
+    background: var(--purple);
+    top: 20%;
+    left: 70%;
+    animation-delay: 1s;
+    animation-duration: 28s;
+}
+
+.circle-bg-5 {
+    width: 90px;
+    height: 90px;
+    background: var(--orange);
+    top: 50%;
+    left: 50%;
+    animation-delay: 3s;
+    animation-duration: 24s;
+}
+
+.circle-bg-6 {
+    width: 110px;
+    height: 110px;
+    background: var(--primary-color);
+    top: 30%;
+    left: 30%;
+    animation-delay: 5s;
+    animation-duration: 26s;
+}
+
+.circle-bg-7 {
+    width: 70px;
+    height: 70px;
+    background: var(--secondary-color);
+    top: 70%;
+    left: 60%;
+    animation-delay: 2.5s;
+    animation-duration: 21s;
+}
+
+.circle-bg-8 {
+    width: 130px;
+    height: 130px;
+    background: var(--accent-color);
+    top: 40%;
+    left: 85%;
+    animation-delay: 4.5s;
+    animation-duration: 23s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(30px, -30px) scale(1.1);
+    }
+    50% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    75% {
+        transform: translate(20px, 30px) scale(1.05);
+    }
+}
+
+/* Navbar */
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 3px solid var(--primary-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 100;
+}
+
+.nav-brand h2 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    color: var(--color);
+    text-decoration: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    background: var(--background);
+}
+
+.nav-link:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.nav-link.logout {
+    background: var(--accent-color);
+    color: white;
+}
+
+.nav-link.logout:hover {
+    background: #c0392b;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Home Content */
+h1 {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    animation: fadeInDown 0.8s ease;
+}
+
+p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    color: var(--color);
+    animation: fadeInUp 0.8s ease;
+}
+
+strong {
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+/* Cards para las fases */
+.phase-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.phase-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 20px;
+    padding: 2.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--primary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.phase-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.phase-card:hover::before {
+    top: -100%;
+    right: -100%;
+}
+
+.phase-card:nth-child(2) {
+    border-left-color: var(--secondary-color);
+}
+
+.phase-card:nth-child(2)::before {
+    background: linear-gradient(45deg, transparent, rgba(46, 204, 113, 0.1), transparent);
+}
+
+.phase-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.phase-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
+}
+
+.phase-card:nth-child(2) h2 {
+    color: var(--secondary-color);
+}
+
+.phase-card p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #555;
+    position: relative;
+    z-index: 1;
+}
+
+.phase-card a {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.phase-card:nth-child(2) a {
+    background: var(--secondary-color);
+}
+
+.phase-card a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+}
+
+.phase-card:nth-child(2) a:hover {
+    box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+}
+
+/* Animaciones */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    .phase-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-bg {
+        opacity: 0.1;
+    }
+}
