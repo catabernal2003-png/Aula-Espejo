@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+!DOCTYPE <html>
+</html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +13,8 @@
         <div class="login-container">
             <div class="circle circle-one"></div>
             <div class="form-container">
-                <img src="https://raw.githubusercontent.com/hicodersofficial/glassmorphism-login-form/master/assets/illustration.png" alt="illustration" class="illustration" />
+                <img class="illustration" src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="Fondo Login">
+
                 <h1 class="opacity">LOGIN</h1>
                 
                 {% if error %}
@@ -35,7 +37,7 @@
                     <button type="submit" class="opacity">Iniciar Sesión</button>
                 </form>
                 <div class="register-forget opacity">
-                    <a href="/register">Registrar</a>
+                    <a href="">Registrar</a>
                 </div>
             </div>
             <div class="circle circle-two"></div>
