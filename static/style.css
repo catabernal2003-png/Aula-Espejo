@@ -14,22 +14,16 @@ html {
 }
 
 body {
-    body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-image: url("../img/Fondo-login.png");
-    background-size: cover;        
-    background-position: center;   
-    background-repeat: no-repeat;  
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
+    background: 
+        linear-gradient(rgba(32, 0, 158, 0.6), rgba(116, 116, 143, 0.7)),
+        url('../img/Fondo-login.png') center/cover no-repeat;
+    font-family: 'Poppins', sans-serif;
+    color: #241e1e;
 }
-
-}
-
 
 a {
     text-decoration: none;
@@ -48,16 +42,16 @@ h1 {
 }
 
 .login-container {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(196, 175, 196, 0.9);
     padding: 40px;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(8, 8, 8, 0.1);
     width: 100%;
     max-width: 400px;
 }
 .form-container {
-    border: 1px solid hsla(0, 0%, 65%, 0.158);
-    box-shadow: 0 0 36px 1px rgba(0, 0, 0, 0.2);
+    border: 1px solid hsl(0, 6%, 7%);
+    box-shadow: 0 0 36px 1px rgba(80, 38, 134, 0.808);
     border-radius: 10px;
     backdrop-filter: blur(20px);
     z-index: 99;
@@ -75,7 +69,7 @@ h1 {
     margin: 2rem 0;
     color: var(--color);
     outline: none;
-    background-color: #9191911f;
+    background-color: #a15e051f;
     border: none;
     border-radius: 5px;
     font-weight: 500;
@@ -90,14 +84,14 @@ h1 {
 
 .login-container form input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 0 3px rgba(96, 117, 131, 0.1);
     animation: wobble 0.3s ease-in;
     -webkit-animation: wobble 0.3s ease-in;
 }
 
 .login-container form button {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    color: white; /* En lugar de rgb(68, 64, 64) */
     display: block;
     padding: 15px;
     border-radius: 10px;
@@ -110,7 +104,7 @@ h1 {
     margin-bottom: 2rem;
     transition: all 0.3s ease-in-out;
     border: none;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 4px 15px rgba(93, 102, 107, 0.3);
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     -ms-border-radius: 10px;
@@ -123,7 +117,7 @@ h1 {
 
 .login-container form button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    box-shadow: 0 6px 20px rgba(15, 15, 15, 0.4);
     -webkit-transform: translateY(-2px);
     -moz-transform: translateY(-2px);
     -ms-transform: translateY(-2px);
@@ -133,7 +127,7 @@ h1 {
 .login-form h2 {
     text-align: center;
     margin-bottom: 30px;
-    color: #333;
+    color: #070707;
  }
 
 .form-group {
@@ -143,7 +137,7 @@ h1 {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #555;
+    color: #333; /* En lugar de #882a2a */
     }
 
 .form-group input {
