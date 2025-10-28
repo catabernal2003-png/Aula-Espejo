@@ -21,18 +21,26 @@
             overflow: hidden;
         }
 
-        .loading-container {
-            text-align: center;
-            position: relative;
-            z-index: 10;
-        }
+       .loading-container {
+           position: relative;
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+          justify-content: center;
+          text-align: center;
+          z-index: 10;
+     }
 
-        .logo-wrapper {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
-        }
+       .logo-wrapper {
+         width: 380px;
+         height: 380px;
+         margin: 0 auto;
+        position: absolute;
+     }
+
 
         .logo-content {
             position: relative;
@@ -133,7 +141,6 @@
         .star2 { top: 200px; right: 80px; animation-delay: 0.5s; }
         .star3 { bottom: 100px; left: 100px; animation-delay: 1s; }
 
-        /* Animación de pulso del logo */
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
@@ -143,7 +150,6 @@
             }
         }
 
-        /* Animación de brillo del bombillo */
         @keyframes glow {
             0%, 100% {
                 box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
@@ -153,7 +159,6 @@
             }
         }
 
-        /* Animación de aleteo */
         @keyframes flap {
             0%, 100% {
                 transform: translateY(-50%) rotate(-20deg);
@@ -163,7 +168,6 @@
             }
         }
 
-        /* Animación del cohete */
         @keyframes rocketFly {
             0% {
                 transform: translate(0, 0) rotate(45deg);
@@ -182,7 +186,6 @@
             }
         }
 
-        /* Animación de parpadeo de estrellas */
         @keyframes starTwinkle {
             0%, 100% {
                 opacity: 0.3;
@@ -194,7 +197,6 @@
             }
         }
 
-        /* Círculo giratorio */
         .spinner {
             position: absolute;
             top: 50%;
@@ -215,7 +217,6 @@
             }
         }
 
-        /* Texto de carga */
         .loading-text {
             margin-top: 40px;
             color: white;
@@ -234,7 +235,6 @@
             }
         }
 
-        /* Puntos animados */
         .dots {
             display: inline-block;
         }
@@ -265,7 +265,6 @@
             }
         }
 
-        /* Barra de progreso */
         .progress-container {
             width: 300px;
             height: 8px;
@@ -302,7 +301,6 @@
             }
         }
 
-        /* Nombre STARTPn */
         .brand-name {
             position: absolute;
             top: 45%;
@@ -327,7 +325,6 @@
             }
         }
 
-        /* Partículas flotantes */
         .particle {
             position: absolute;
             width: 4px;
@@ -355,7 +352,6 @@
             }
         }
 
-        /* Mensaje motivacional */
         .motivational {
             position: absolute;
             bottom: 30px;

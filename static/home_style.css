@@ -140,57 +140,100 @@ body {
 
 /* Navbar */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 3px solid var(--primary-color);
-    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 100;
+    padding: 0.1px 1px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Contenedor del logo y título --- */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fondo-login {
+    width: 50px;       /* Ajusta el tamaño según sea necesario */
+    height: auto;      /* Mantiene la proporción de la imagen */
+    object-fit: contain; /* Asegura que la imagen se ajuste dentro del contenedor */
+    margin-right: 8px; /* Espacio entre la imagen y el texto */
+}
+
+/* --- Texto del título junto al logo --- */
 .nav-brand h2 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.1em;  /* 🔹 apenas más grande que la imagen */
+    margin: 0;
+    line-height: 1;
+    color: #ffffff;
+    font-weight: 600;
+}
+/* --- Texto “StartPn Jr” ajustado al tamaño del logo --- */
+.nav-title {
+    font-size: 2em;    /* 🔹 casi del mismo tamaño que el logo */
+    font-weight: 600;
+    background-color: #c8ff00;
+    color: #0c0c0c;
+    letter-spacing: 0.3px;
+    line-height: 1;
 }
 
+/* --- Enlaces del menú --- */
 .nav-links {
     display: flex;
-    gap: 1.5rem;
     align-items: center;
+    gap: 25px;
 }
 
 .nav-link {
-    color: var(--color);
     text-decoration: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    background: var(--background);
+    background-color: #c8ff00;
+    color: #0f0f0f;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2em;
+    font-weight: 500;
+    border-radius: 20px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+/* --- Efecto al pasar el mouse --- */
+.nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #00c3ff;
+    transition: width 0.3s;
 }
 
 .nav-link:hover {
-    background: var(--primary-color);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    color: #00c3ff;
 }
 
-.nav-link.logout {
-    background: var(--accent-color);
-    color: white;
+.nav-link:hover::after {
+    width: 100%;
 }
 
-.nav-link.logout:hover {
-    background: #c0392b;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+/* --- Enlace de cerrar sesión destacado --- */
+.logout {
+    background-color: #c8ff00;
+    color: #1b1b1b;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: 0.3s;
 }
 
+.logout:hover {
+    background-color: #0090c7;
+}
 /* Container */
 .container {
     max-width: 1200px;

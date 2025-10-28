@@ -66,6 +66,7 @@ h1 {
     display: block;
     padding: 14.5px;
     width: 100%;
+    left: 50%;
     margin: 2rem 0;
     color: var(--color);
     outline: none;
