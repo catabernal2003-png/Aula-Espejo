@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-dashboard">
+
+    <h1 class="dashboard-title">Panel Principal del Administrador</h1>
+    <p class="dashboard-subtitle">Bienvenido, {{ session['username'] }}</p>
+
+    <div class="dashboard-cards">
+
+        <a href="{{ url_for('admin_usuarios') }}" class="card">
+            <h2>Gestión de Usuarios</h2>
+            <p>Administra los usuarios, roles y permisos del sistema.</p>
+        </a>
+
+        <a href="{{ url_for('home') }}" class="card">
+            <h2>Ver Plataforma</h2>
+            <p>Accede a la vista general del sistema.</p>
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

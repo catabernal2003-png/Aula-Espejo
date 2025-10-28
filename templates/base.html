@@ -21,18 +21,24 @@
     </div>
 
     {% if session.get('user') %}
-  <nav class="navbar">
+<nav class="navbar">
     <div class="nav-left">
         <img src="{{ url_for('static', filename='/img/Fondo-login.png') }}" alt="Fondo login" class="Fondo-login">
         <span class="nav-title">StartPn Jr</span>
     </div>
+
     <div class="nav-links">
-        <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
-        <a href="{{ url_for('fase1') }}" class="nav-link">Fase 1</a>
-        <a href="{{ url_for('fase2') }}" class="nav-link">Fase 2</a>
+        {% if session.get('rol') == 'Administrador' %}
+            <a href="{{ url_for('home_admin') }}" class="nav-link admin-link">Panel de Administración</a>
+        {% else %}
+            <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
+            <a href="{{ url_for('fase1') }}" class="nav-link">Fase 1</a>
+            <a href="{{ url_for('fase2') }}" class="nav-link">Fase 2</a>
+        {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar sesión</a>
     </div>
 </nav>
+
 
     {% endif %}
     <div class="container">

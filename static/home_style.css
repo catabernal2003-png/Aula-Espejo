@@ -35,6 +35,21 @@ body {
     z-index: -1;
     overflow: hidden;
 }
+.admin-link {
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    color: white !important;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+    background: #3c8c3d;
+    transform: translateY(-2px);
+}
+
 
 .circle-bg {
     position: absolute;
