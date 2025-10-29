@@ -214,14 +214,13 @@ def logout():
     flash('Has cerrado sesión correctamente', 'info')
     return redirect(url_for('login'))
 
-@app.route('/admin/usuarios')
+@app.route('/admin/usuarios', methods=['GET', 'POST'])
 def admin_usuarios():
-    # Verificar que esté logueado
+    # Verificar sesión y rol
     if 'user_id' not in session:
         flash('Primero debes iniciar sesión', 'error')
         return redirect(url_for('login'))
 
-    # Verificar que sea administrador
     if session.get('rol') != 'Administrador':
         flash('No tienes permiso para acceder a esta sección', 'error')
         return redirect(url_for('home'))
@@ -229,22 +228,35 @@ def admin_usuarios():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    # Traer todos los usuarios con su rol
-    cursor.execute('''
+    search = None
+    query = '''
         SELECT u.id, u.username, r.nombre AS rol
         FROM users u
         JOIN roles r ON u.rol_id = r.id
-    ''')
+    '''
+
+    # Si se envía una búsqueda (POST)
+    if request.method == 'POST':
+        search = request.form.get('search', '').strip()
+        if search:
+            query += " WHERE u.username LIKE %s OR r.nombre LIKE %s"
+            cursor.execute(query, (f"%{search}%", f"%{search}%"))
+        else:
+            cursor.execute(query)
+    else:
+        cursor.execute(query)
+
     usuarios = cursor.fetchall()
 
-    # Traer todos los roles para los combos de selección
+    # Cargar roles para los select
     cursor.execute('SELECT * FROM roles')
     roles = cursor.fetchall()
 
     cursor.close()
     connection.close()
 
-    return render_template('admin_usuarios.html', usuarios=usuarios, roles=roles)
+    return render_template('admin_usuarios.html', usuarios=usuarios, roles=roles, search=search)
+
 
 @app.route('/admin/usuarios/actualizar_rol', methods=['POST'])
 def actualizar_rol():
@@ -331,6 +343,7 @@ def crear_usuario():
     except Error as e:
         flash(f'Error al crear usuario: {e}', 'error')
         return redirect(url_for('admin_usuarios'))
+
 
 
 if __name__ == '__main__':

@@ -7,87 +7,80 @@
 
     <h1>Panel de Administración</h1>
 
-    <!-- Mensajes flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert {{ category }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-    <!-- FORMULARIO PARA CREAR USUARIOS -->
-<div class="crear-usuario">
-    <h2>Crear nuevo usuario</h2>
-    <form action="{{ url_for('crear_usuario') }}" method="POST" class="crear-usuario-form">
-        <input type="text" name="username" placeholder="Nombre de usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <select name="rol_id" required>
-            <option value="">Seleccione un rol</option>
-            {% for rol in roles %}
-                <option value="{{ rol.id }}">{{ rol.nombre }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn-crear">Crear usuario</button>
-    </form>
-</div>
-    <div class="section-divider"></div>
-<h2 class="section-title">Lista de usuarios registrados</h2>
+    <!-- ======= SECCIÓN: CREAR USUARIO ======= -->
+    <div class="admin-card">
+        <h2>Crear Usuario</h2>
+        <form action="{{ url_for('crear_usuario') }}" method="POST" class="crear-usuario-form">
+            <input type="text" name="username" placeholder="Nombre de usuario" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <select name="rol_id" required>
+                {% for rol in roles %}
+                    <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-crear">Crear</button>
+        </form>
+    </div>
 
-<div class="table-container">
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Usuario</th>
-                <th>Rol actual</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>{{ usuario.id }}</td>
-                <td>{{ usuario.username }}</td>
-                <td>{{ usuario.rol }}</td>
-                <td>
-                    <form action="{{ url_for('actualizar_rol') }}" method="POST" style="display:inline;">
-                        <input type="hidden" name="user_id" value="{{ usuario.id }}">
-                        <select name="rol_id" class="select-rol">
-                            {% for rol in roles %}
-                                <option value="{{ rol.id }}" {% if rol.nombre == usuario.rol %}selected{% endif %}>
-                                    {{ rol.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn-guardar">Guardar</button>
-                    </form>
+    <!-- ======= SECCIÓN: LISTAR Y BUSCAR ======= -->
+    <div class="admin-card table-container">
+        <h2>Usuarios Registrados</h2>
 
-                    <form action="{{ url_for('eliminar_usuario') }}" method="POST" style="display:inline;" onsubmit="return confirmDelete('{{ usuario.username }}')">
-                        <input type="hidden" name="user_id" value="{{ usuario.id }}">
-                        <button type="submit" class="btn-eliminar">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <!-- Formulario de búsqueda -->
+        <form method="POST" class="buscar-form">
+            <input type="text" name="search" placeholder="Buscar usuario o rol..." value="{{ search or '' }}">
+            <button type="submit" class="btn-buscar">Buscar</button>
+            <a href="{{ url_for('admin_usuarios') }}" class="btn-reset">Limpiar</a>
+        </form>
 
+        <!-- Tabla de usuarios -->
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Rol actual</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id }}</td>
+                    <td>{{ usuario.username }}</td>
+                    <td>{{ usuario.rol }}</td>
+                    <td>
+                        <form action="{{ url_for('actualizar_rol') }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="user_id" value="{{ usuario.id }}">
+                            <select name="rol_id" class="select-rol">
+                                {% for rol in roles %}
+                                    <option value="{{ rol.id }}" {% if rol.nombre == usuario.rol %}selected{% endif %}>
+                                        {{ rol.nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn-guardar">Guardar</button>
+                        </form>
 
-    <a href="{{ url_for('home_admin') }}" class="admin-link">⬅ Volver al inicio</a>
+                        <form action="{{ url_for('eliminar_usuario') }}" method="POST" style="display:inline;" onsubmit="return confirmDelete('{{ usuario.username }}')">
+                            <input type="hidden" name="user_id" value="{{ usuario.id }}">
+                            <button type="submit" class="btn-eliminar">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ url_for('home_admin') }}" class="btn-volver">Volver al inicio</a>
 
 </div>
 
 <script>
 function confirmDelete(username) {
-    return confirm(`¿Estás seguro de que deseas eliminar al usuario "${username}"? Esta acción no se puede deshacer.`);
+    return confirm(`¿Estás seguro de que deseas eliminar al usuario "${username}"?`);
 }
-setTimeout(() => {
-    document.querySelectorAll('.alert').forEach(alert => {
-        alert.style.opacity = '0';
-        setTimeout(() => alert.remove(), 500);
-    });
-}, 4000);
 </script>
 
 {% endblock %}

@@ -61,6 +61,100 @@
     background-color: #eef2ff;
     transition: 0.3s ease;
 }
+/* ======= TARJETAS ADMIN ======= */
+.admin-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    animation: fadeIn 0.4s ease;
+}
+
+.admin-card h2 {
+    color: #4a47a3;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-left: 5px solid #667eea;
+    padding-left: 10px;
+}
+
+/* Transición sutil al pasar el mouse */
+.admin-card:hover {
+    transform: translateY(-3px);
+    transition: 0.3s ease;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+/* ======= FORMULARIOS DENTRO DE TARJETAS ======= */
+.crear-usuario-form, .buscar-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .crear-usuario-form, .buscar-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .crear-usuario-form input,
+    .crear-usuario-form select,
+    .buscar-form input {
+        width: 90%;
+    }
+}
+
+
+/* ======= BUSCADOR DE ROLES ======= */
+.buscar-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.buscar-form input {
+    width: 300px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.buscar-form input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-buscar,
+.btn-reset {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-buscar:hover,
+.btn-reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-reset {
+    background: #e94560;
+}
+
 
 /* ======= SELECT Y BOTONES ======= */
 .admin-table select {
