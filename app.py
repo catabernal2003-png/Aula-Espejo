@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+import csv
+import io
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
+
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_aqui'
@@ -136,26 +139,33 @@ def home():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    mensaje = f"Bienvenido, {session['username']} ({session['rol']})"
-    return render_template('home.html', mensaje=mensaje)
+    return render_template('home.html', 
+        username=session['username'],
+        rol=session['rol'],
+        user=session['username'],
+        mensaje=f"Bienvenido, {session['username']}"
+    )
 
+@app.route('/modulos')
+def modulos():
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    return render_template('modulos.html', 
+        username=session['username'],
+        user=session['username']  # Add this line
+    )
 
-# Añade estas rutas que faltan
-@app.route('/fase1')
-def fase1():
+@app.route('/recursos')
+def recursos():
     if 'user_id' not in session:
         flash('Debes iniciar sesión para acceder a esta página', 'error')
         return redirect(url_for('login'))
     
-    return render_template('fase1.html', username=session['username'])
-
-@app.route('/fase2')
-def fase2():
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta página', 'error')
-        return redirect(url_for('login'))
-    
-    return render_template('fase2.html', username=session['username'])
+    return render_template('fase2.html', 
+        username=session['username'],
+        user=session['username']  # Add this line
+    )
 
 @app.route('/logout')
 def logout():
@@ -197,6 +207,16 @@ def admin_usuarios():
 
     usuarios = cursor.fetchall()
 
+    # Contar usuarios por rol
+    cursor.execute('''
+        SELECT r.nombre AS rol, COUNT(u.id) AS total
+        FROM roles r
+        LEFT JOIN users u ON r.id = u.rol_id
+        GROUP BY r.nombre
+    ''')
+    resumen_roles = cursor.fetchall()
+
+
     # Cargar roles para los select
     cursor.execute('SELECT * FROM roles')
     roles = cursor.fetchall()
@@ -204,7 +224,12 @@ def admin_usuarios():
     cursor.close()
     connection.close()
 
-    return render_template('admin_usuarios.html', usuarios=usuarios, roles=roles, search=search)
+    return render_template('admin_usuarios.html', 
+                            usuarios=usuarios,  
+                            roles=roles, 
+                            resumen_roles=resumen_roles,   
+                            search=search
+                            )
 
 
 @app.route('/admin/usuarios/actualizar_rol', methods=['POST'])
@@ -251,7 +276,9 @@ def home_admin():
     if 'user_id' not in session or session.get('rol') != 'Administrador':
         flash('Acceso no autorizado', 'error')
         return redirect(url_for('login'))
-    return render_template('home_admin.html')
+    return render_template('home_admin.html',
+        user=session['username']  # Add this line
+    )
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
@@ -296,40 +323,17 @@ def crear_usuario():
 @app.route('/panel_emprendedor', methods=['GET', 'POST'])
 def panel_emprendedor():
     if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta página', 'error')
         return redirect(url_for('login'))
+    return render_template('panel_emprendedor.html',
+        user=session['username']  # Add this line
+    )
 
-    if session.get('rol') != 'Emprendedor':
-        flash('No tienes permiso para acceder a este panel', 'error')
-        return redirect(url_for('home'))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    user_id = session['user_id']
-
-    if request.method == 'POST':
-        nuevo_nombre = request.form.get('username')
-        nuevo_correo = request.form.get('email')
-        descripcion = request.form.get('descripcion')
-
-        cursor.execute("""
-            UPDATE users
-            SET username = %s, email = %s, descripcion = %s
-            WHERE id = %s
-        """, (nuevo_nombre, nuevo_correo, descripcion, user_id))
-        connection.commit()
-
-        session['username'] = nuevo_nombre
-        flash('Información actualizada correctamente.', 'success')
-
-    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
-    user = cursor.fetchone()
-
-    cursor.close()
-    connection.close()
-
-    return render_template('panel_emprendedor.html', user=user)
-
+@app.route('/admin/exportar_usuarios')
+def exportar_usuarios():
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        return redirect(url_for('login'))
+    # Add your export logic here
+    return "Función de exportar usuarios"
 
 if __name__ == '__main__':
     init_db()
