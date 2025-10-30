@@ -22,6 +22,12 @@
             padding: 20px;
         }
 
+                .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #4caf50;
+        }
+
         .container {
             width: 100%;
             max-width: 450px;
@@ -396,14 +402,12 @@
                 if (input.type === 'password') {
                     input.type = 'text';
                     this.setAttribute('aria-label', 'Ocultar contraseña');
-                    // Cambiar a icono de "ojo cerrado"
                     svg.innerHTML = `
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     `;
                 } else {
                     input.type = 'password';
                     this.setAttribute('aria-label', 'Mostrar contraseña');
-                    // Cambiar a icono de "ojo abierto"
                     svg.innerHTML = `
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -445,25 +449,21 @@
             const value = this.value;
             let strength = 0;
             
-            // Requirements
             const hasLength = value.length >= 8;
             const hasUppercase = /[A-Z]/.test(value);
             const hasLowercase = /[a-z]/.test(value);
             const hasNumber = /\d/.test(value);
             
-            // Update requirement indicators
             document.getElementById('req-length').classList.toggle('met', hasLength);
             document.getElementById('req-uppercase').classList.toggle('met', hasUppercase);
             document.getElementById('req-lowercase').classList.toggle('met', hasLowercase);
             document.getElementById('req-number').classList.toggle('met', hasNumber);
             
-            // Calculate strength
             if (hasLength) strength++;
             if (hasUppercase) strength++;
             if (hasLowercase) strength++;
             if (hasNumber) strength++;
             
-            // Update strength bar
             strengthFill.className = 'strength-fill';
             
             if (strength <= 2) {
@@ -480,7 +480,6 @@
                 strengthText.style.color = '#4caf50';
             }
             
-            // Validate password match
             validatePasswordMatch();
         });
 
@@ -515,7 +514,6 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate all fields
             const usernameValid = username.value.length >= 3;
             const passwordValid = password.value.length >= 8 && 
                                 /[A-Z]/.test(password.value) && 
@@ -538,32 +536,51 @@
                 return;
             }
             
-            // If all validations pass, submit the form
-            // In production, replace this with actual form submission
             submitBtn.disabled = true;
             submitBtn.textContent = 'Registrando...';
             
-            // Simulate API call
-            setTimeout(() => {
-                showAlert('¡Registro exitoso! Redirigiendo...', 'success');
-                setTimeout(() => {
-                    // window.location.href = '/login';
-                    console.log('Form would submit with:', {
-                        username: username.value,
-                        password: password.value
-                    });
-                }, 1500);
-            }, 1000);
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'username': username.value,
+                    'password': password.value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('¡Registro exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 1500);
+                } else {
+                    showAlert(data.message || 'Error al registrar usuario', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Registrar';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error de conexión. Por favor intenta de nuevo.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrar';
+            });
         });
 
         function showAlert(message, type) {
             const container = document.getElementById('alertContainer');
-            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
             
-            if (type === 'success') {
-                setTimeout(() => {
-                    container.innerHTML = '';
-                }, 3000);
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            if (type === 'error') {
+                setTimeout(() => alert.remove(), 5000);
             }
         }
     </script>

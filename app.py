@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
@@ -74,56 +74,50 @@ def init_db():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
-        
-        # Validaciones
-        if not username or not password:
-            return render_template('register.html', error='Todos los campos son obligatorios')
-        
-        if password != confirm_password:
-            return render_template('register.html', error='Las contraseñas no coinciden')
-        
-        if len(password) < 6:
-            return render_template('register.html', error='La contraseña debe tener al menos 6 caracteres')
-        
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # Validaciones básicas
+        if not username or len(username) < 3:
+            return jsonify({'success': False, 'message': 'Usuario inválido'}), 400
+
+        if not password or len(password) < 8:
+            return jsonify({'success': False, 'message': 'Contraseña inválida'}), 400
+
         connection = get_db_connection()
         if not connection:
-            return render_template('register.html', error='Error de conexión a la base de datos')
-        
+            return jsonify({'success': False, 'message': 'Error de conexión a la base de datos'}), 500
+
         try:
             cursor = connection.cursor()
-            
-            # Verificar si el usuario ya existe
+
+            # Verificar si ya existe
             cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
             existing_user = cursor.fetchone()
-            
             if existing_user:
                 cursor.close()
                 connection.close()
-                return render_template('register.html', error='El nombre de usuario ya existe')
-            
-            # Crear nuevo usuario
+                return jsonify({'success': False, 'message': 'El usuario ya existe'}), 400
+
+            # Insertar nuevo usuario
             hashed_password = generate_password_hash(password)
             cursor.execute(
                 'INSERT INTO users (username, password) VALUES (%s, %s)',
                 (username, hashed_password)
             )
             connection.commit()
+
             cursor.close()
             connection.close()
-            
-            flash('Registro exitoso. Ahora puedes iniciar sesión.', 'success')
-            return redirect(url_for('login'))
-            
+            return jsonify({'success': True, 'message': 'Registro exitoso'}), 200
+
         except Error as e:
-            if connection:
-                cursor.close()
-                connection.close()
-            return render_template('register.html', error='Error en el registro: ' + str(e))
-    
+            print(f"Error: {e}")
+            return jsonify({'success': False, 'message': 'Error al registrar usuario'}), 500
+
+    # Si entra por GET, muestra la plantilla
     return render_template('register.html')
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
