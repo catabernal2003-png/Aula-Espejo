@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<div style="animation: fadeInUp 0.8s ease;">
+<div class="welcome-message">
     <h1>{{ mensaje }}</h1>
+    {% if rol %}
+    <p>({{ rol }})</p>
+    {% endif %}
+</div>
+<div style="animation: fadeInUp 0.8s ease;">
     <p>Aplicación web para integrar la metodología <strong>CRISP-ML</strong> con el proyecto StartPn Jr.</p>
     <p>Selecciona una de las fases del menú superior o haz clic en las tarjetas a continuación para continuar.</p>
     
