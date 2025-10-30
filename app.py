@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+import csv
+import io
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
+
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_aqui'
@@ -184,18 +187,16 @@ def home():
     mensaje = f"Bienvenido, {session['username']} ({session['rol']})"
     return render_template('home.html', mensaje=mensaje)
 
-
-# Añade estas rutas que faltan
-@app.route('/fase1')
-def fase1():
+@app.route('/modulos')
+def modulos():
     if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta página', 'error')
+        flash('Debes iniciar sesión para acceder a esta sección', 'error')
         return redirect(url_for('login'))
-    
-    return render_template('fase1.html', username=session['username'])
+    return render_template('modulos.html', username=session['username'])
 
-@app.route('/fase2')
-def fase2():
+
+@app.route('/recursos')
+def recursos():
     if 'user_id' not in session:
         flash('Debes iniciar sesión para acceder a esta página', 'error')
         return redirect(url_for('login'))
@@ -242,6 +243,16 @@ def admin_usuarios():
 
     usuarios = cursor.fetchall()
 
+    # Contar usuarios por rol
+    cursor.execute('''
+        SELECT r.nombre AS rol, COUNT(u.id) AS total
+        FROM roles r
+        LEFT JOIN users u ON r.id = u.rol_id
+        GROUP BY r.nombre
+    ''')
+    resumen_roles = cursor.fetchall()
+
+
     # Cargar roles para los select
     cursor.execute('SELECT * FROM roles')
     roles = cursor.fetchall()
@@ -249,7 +260,12 @@ def admin_usuarios():
     cursor.close()
     connection.close()
 
-    return render_template('admin_usuarios.html', usuarios=usuarios, roles=roles, search=search)
+    return render_template('admin_usuarios.html', 
+                            usuarios=usuarios,  
+                            roles=roles, 
+                            resumen_roles=resumen_roles,   
+                            search=search
+                            )
 
 
 @app.route('/admin/usuarios/actualizar_rol', methods=['POST'])
@@ -337,6 +353,44 @@ def crear_usuario():
     except Error as e:
         flash(f'Error al crear usuario: {e}', 'error')
         return redirect(url_for('admin_usuarios'))
+
+@app.route('/admin/exportar_usuarios')
+def exportar_usuarios():
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    # Trae todos los usuarios con su rol
+    cursor.execute('''
+        SELECT u.id, u.username, r.nombre AS rol, u.created_at
+        FROM users u
+        JOIN roles r ON u.rol_id = r.id
+    ''')
+    usuarios = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    # Crea un archivo CSV en memoria
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Cabeceras
+    writer.writerow(['ID', 'Usuario', 'Rol', 'Fecha de creación'])
+
+    # Filas
+    for u in usuarios:
+        writer.writerow([u['id'], u['username'], u['rol'], u['created_at']])
+    
+    # Preparar respuesta Flask como archivo descargable
+    response = Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment;filename=usuarios.csv'}
+    )
+    return response
 
 
 
