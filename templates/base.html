@@ -27,17 +27,17 @@
         <span class="nav-title">StartPn Jr</span>
     </div>
 
-    <div class="nav-links">
-        {% if session.get('rol') == 'Administrador' %}
-            <a href="{{ url_for('home_admin') }}" class="nav-link admin-link">Panel de Administración</a>
-        {% else %}
-            <a href="{{ url_for('home') }}" class="nav-link">Inicio</a>
-            <a href="{{ url_for('fase1') }}" class="nav-link">Fase 1</a>
-            <a href="{{ url_for('fase2') }}" class="nav-link">Fase 2</a>
-        {% endif %}
-        <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar sesión</a>
+<div class="menu-opciones">
+    <button class="menu-btn">⋮</button>
+    <div class="menu-desplegable">
+        <a href="{{ url_for('home') }}">🏡 Inicio</a>
+        <a href="{{ url_for('panel_emprendedor') }}">🚀 Ir al Panel</a>
+        <a href="{{ url_for('logout') }}">🚪 Cerrar sesión</a>
     </div>
+</div>
 </nav>
+
+
 
 
     {% endif %}

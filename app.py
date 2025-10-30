@@ -335,6 +335,40 @@ def exportar_usuarios():
     # Add your export logic here
     return "Función de exportar usuarios"
 
+@app.route('/fase1')
+@app.route('/fase1')
+def fase1():
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para acceder a esta página', 'error')
+        return redirect(url_for('login'))
+
+    # Verificamos que sea un emprendedor
+    if session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección.', 'error')
+        return redirect(url_for('home'))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    user_id = session['user_id']
+
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return render_template('fase1_emprendedor.html', user=user)
+
+
+@app.route('/fase2')
+def fase2():
+    # Igual que la anterior, solo para evitar errores de URL.
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para acceder a esta página', 'error')
+        return redirect(url_for('login'))
+    return render_template('fase_placeholder.html', titulo="Fase 2")
+
+
 if __name__ == '__main__':
     init_db()
     print("Servidor Flask iniciado en http://localhost:5000")

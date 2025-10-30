@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Fase 1 - Emprendedor{% endblock %}
+
+{% block content %}
+<style>
+    .fase-container {
+        max-width: 800px;
+        margin: 60px auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+    }
+
+    .fase-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        border-radius: 15px;
+        padding: 20px;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .fase-section h4 {
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .fase-section p {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .btn-volver {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 12px 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: 0.3s ease;
+    }
+
+    .btn-volver:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+    }
+</style>
+<div class="text-end mb-3">
+    <a href="{{ url_for('panel_emprendedor') }}" class="btn btn-volver-top">
+        🏠 Ir al Panel
+    </a>
+</div>
+
+<style>
+    .btn-volver-top {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-volver-top:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+</style>
+
+<div class="fase-container">
+    <div class="fase-header">
+        🚀 Fase 1: Introducción al Emprendimiento
+    </div>
+
+    <div class="fase-section">
+        <h4>💡 Objetivo de esta fase</h4>
+        <p>
+            En esta primera fase, podrás reflexionar sobre tu idea de negocio, definir tus objetivos
+            y comprender los pasos iniciales que todo emprendedor debe seguir.
+        </p>
+    </div>
+
+    <div class="fase-section mt-4">
+        <h4>📋 Actividades sugeridas</h4>
+        <ul>
+            <li>Define tu idea principal de emprendimiento.</li>
+            <li>Identifica a tu público objetivo.</li>
+            <li>Escribe un breve resumen de tu propuesta de valor.</li>
+        </ul>
+    </div>
+
+    <div class="fase-section mt-4">
+        <h4>🧠 Consejo</h4>
+        <p>
+            No te preocupes si tu idea aún no está perfecta. Lo más importante es empezar.
+            Cada paso te acercará más a hacerla realidad 💪.
+        </p>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('panel_emprendedor') }}" class="btn btn-volver">⬅️ Volver al Panel</a>
+    </div>
+</div>
+{% endblock %}
