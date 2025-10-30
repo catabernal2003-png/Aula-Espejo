@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel del Emprendedor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .contenedor {
+            width: 60%;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h2>Bienvenido, {{ user.username }} 👋</h2>
+
+        <form method="POST">
+            <label>Nombre:</label>
+            <input type="text" name="username" value="{{ user.username }}" required>
+
+            <label>Correo:</label>
+            <input type="email" name="email" value="{{ user.email or '' }}">
+
+            <label>Descripción del emprendimiento:</label>
+            <textarea name="descripcion" rows="4">{{ user.descripcion or '' }}</textarea>
+
+            <button type="submit">Guardar cambios</button>
+        </form>
+
+        <p style="margin-top:15px;"><a href="/logout">Cerrar sesión</a></p>
+    </div>
+</body>
+</html>

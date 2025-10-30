@@ -71,54 +71,6 @@ def init_db():
             print(f"Error creando tablas: {e}")
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        # Validaciones básicas
-        if not username or len(username) < 3:
-            return jsonify({'success': False, 'message': 'Usuario inválido'}), 400
-
-        if not password or len(password) < 8:
-            return jsonify({'success': False, 'message': 'Contraseña inválida'}), 400
-
-        connection = get_db_connection()
-        if not connection:
-            return jsonify({'success': False, 'message': 'Error de conexión a la base de datos'}), 500
-
-        try:
-            cursor = connection.cursor()
-
-            # Verificar si ya existe
-            cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
-            existing_user = cursor.fetchone()
-            if existing_user:
-                cursor.close()
-                connection.close()
-                return jsonify({'success': False, 'message': 'El usuario ya existe'}), 400
-
-            # Insertar nuevo usuario
-            hashed_password = generate_password_hash(password)
-            cursor.execute(
-                'INSERT INTO users (username, password) VALUES (%s, %s)',
-                (username, hashed_password)
-            )
-            connection.commit()
-
-            cursor.close()
-            connection.close()
-            return jsonify({'success': True, 'message': 'Registro exitoso'}), 200
-
-        except Error as e:
-            print(f"Error: {e}")
-            return jsonify({'success': False, 'message': 'Error al registrar usuario'}), 500
-
-    # Si entra por GET, muestra la plantilla
-    return render_template('register.html')
-
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -152,12 +104,14 @@ def login():
 
                 cursor.close()
                 connection.close()
-                
+
                 flash(f'¡Bienvenido {username} ({user["rol"]})!', 'success')
-                
-                # Si es administrador, lo enviamos a su propio home
+
+                # 👇 Aquí debe estar el bloque nuevo, sin romper el try/except
                 if user['rol'].lower() == 'administrador':
                     return redirect(url_for('home_admin'))
+                elif user['rol'].lower() == 'emprendedor':
+                    return redirect(url_for('panel_emprendedor'))
                 else:
                     return redirect(url_for('home'))
             
@@ -166,13 +120,14 @@ def login():
                 connection.close()
                 return render_template('login.html', error='Usuario o contraseña incorrectos')
         
-        except Error as e:
+        except Error as e:  # 👈 Este except debe ir después del try
             if connection:
                 cursor.close()
                 connection.close()
             return render_template('login.html', error='Error en el login: ' + str(e))
     
     return render_template('login.html')
+
 
 
 
@@ -338,6 +293,42 @@ def crear_usuario():
         flash(f'Error al crear usuario: {e}', 'error')
         return redirect(url_for('admin_usuarios'))
 
+@app.route('/panel_emprendedor', methods=['GET', 'POST'])
+def panel_emprendedor():
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para acceder a esta página', 'error')
+        return redirect(url_for('login'))
+
+    if session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a este panel', 'error')
+        return redirect(url_for('home'))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        nuevo_nombre = request.form.get('username')
+        nuevo_correo = request.form.get('email')
+        descripcion = request.form.get('descripcion')
+
+        cursor.execute("""
+            UPDATE users
+            SET username = %s, email = %s, descripcion = %s
+            WHERE id = %s
+        """, (nuevo_nombre, nuevo_correo, descripcion, user_id))
+        connection.commit()
+
+        session['username'] = nuevo_nombre
+        flash('Información actualizada correctamente.', 'success')
+
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return render_template('panel_emprendedor.html', user=user)
 
 
 if __name__ == '__main__':
