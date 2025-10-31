@@ -74,7 +74,7 @@ def init_db():
             cursor.close()
             connection.close()
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -83,12 +83,11 @@ def login():
         
         connection = get_db_connection()
         if not connection:
-            return render_template('login.html', error='Error de conexión a la base de datos')
+            flash('Error de conexión a la base de datos', 'error')
+            return render_template('login.html')
         
         try:
             cursor = connection.cursor(dictionary=True)
-            
-            # Consulta con JOIN para traer el rol del usuario
             cursor.execute('''
                 SELECT u.*, r.nombre AS rol
                 FROM users u
@@ -99,18 +98,13 @@ def login():
             user = cursor.fetchone()
             
             if user and check_password_hash(user['password'], password):
-                # Guardar sesión incluyendo el rol
                 session['user_id'] = user['id']
                 session['username'] = user['username']
-                session['user'] = user['username']  # compatibilidad con base.html
+                session['user'] = user['username']
                 session['rol'] = user['rol']
 
-                cursor.close()
-                connection.close()
-
-                flash(f'¡Bienvenido {username} ({user["rol"]})!', 'success')
-
-                # 👇 Aquí debe estar el bloque nuevo, sin romper el try/except
+                flash(f'¡Bienvenido {username}!', 'success')
+                
                 if user['rol'].lower() == 'administrador':
                     return redirect(url_for('home_admin'))
                 elif user['rol'].lower() == 'emprendedor':
@@ -118,21 +112,77 @@ def login():
                 else:
                     return redirect(url_for('home'))
             
-            else:
+            flash('Usuario o contraseña incorrectos', 'error')
+            return render_template('login.html')
+            
+        except Error as e:
+            flash('Error en el sistema. Por favor, intenta más tarde.', 'error')
+            return render_template('login.html')
+        finally:
+            if connection.is_connected():
                 cursor.close()
                 connection.close()
-                return render_template('login.html', error='Usuario o contraseña incorrectos')
-        
-        except Error as e:  # 👈 Este except debe ir después del try
-            if connection:
-                cursor.close()
-                connection.close()
-            return render_template('login.html', error='Error en el login: ' + str(e))
     
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
+        if password != confirm_password:
+            flash('Las contraseñas no coinciden', 'error')
+            return render_template('register.html')
 
+        connection = get_db_connection()
+        if not connection:
+            flash('Error de conexión a la base de datos', 'error')
+            return render_template('register.html')
+
+        cursor = connection.cursor()
+        
+        # Verificar si el usuario ya existe
+        cursor.execute('SELECT id FROM users WHERE username = %s', (username,))
+        if cursor.fetchone():
+            cursor.close()
+            connection.close()
+            flash('El nombre de usuario ya existe', 'error')
+            return render_template('register.html')
+
+        # Crear nuevo usuario (por defecto como rol "Usuario" - id 4)
+        hashed_password = generate_password_hash(password)
+        try:
+            cursor.execute('INSERT INTO users (username, password, rol_id) VALUES (%s, %s, 4)',
+                         (username, hashed_password))
+            connection.commit()
+            flash('Cuenta creada exitosamente. Por favor inicia sesión.', 'success')
+            return redirect(url_for('login'))
+        except Error as e:
+            flash(f'Error al crear la cuenta: {str(e)}', 'error')
+        finally:
+            cursor.close()
+            connection.close()
+
+    return render_template('register.html')
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        
+        # Here you would typically:
+        # 1. Verify the user exists
+        # 2. Generate a reset token
+        # 3. Send an email with reset instructions
+        # For now, we'll just show a message
+        
+        flash('Si el usuario existe, recibirás un correo con instrucciones para resetear tu contraseña.', 'info')
+        return redirect(url_for('login'))
+        
+    return render_template('reset_password.html')
 
 @app.route('/home')
 def home():

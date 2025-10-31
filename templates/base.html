@@ -3,37 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StartPn Jr</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='home_style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <!-- Fondo animado con círculos -->
-    <div class="background-animation">
-        <div class="circle-bg circle-bg-1"></div>
-        <div class="circle-bg circle-bg-2"></div>
-        <div class="circle-bg circle-bg-3"></div>
-        <div class="circle-bg circle-bg-4"></div>
-        <div class="circle-bg circle-bg-5"></div>
-        <div class="circle-bg circle-bg-6"></div>
-        <div class="circle-bg circle-bg-7"></div>
-        <div class="circle-bg circle-bg-8"></div>
-    </div>
-
+    <title>StartPn Jr - {% block title %}{% endblock %}</title>
+    
+    <!-- CSS principal y fuentes -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos base -->
     <style>
-        .nav-header {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        :root {
+            --primary: #4834d4;
+            --secondary: #686de0;
+            --success: #6ab04c;
+            --info: #45aaf2;
+            --warning: #fa8231;
+            --danger: #eb4d4b;
+            --light: #f5f6fa;
+            --dark: #2f3640;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding-top: 70px;
+            background-color: #f8f9fe;
+            color: var(--dark);
+        }
+
+        .navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
+            background: white;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 0.8rem 2rem;
         }
 
-        .nav-container {
+        .navbar-container {
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
@@ -42,10 +52,20 @@
         }
 
         .brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             text-decoration: none;
+            color: var(--dark);
+        }
+
+        .brand img {
+            height: 40px;
+        }
+
+        .brand span {
+            font-size: 1.4rem;
+            font-weight: 600;
         }
 
         .nav-links {
@@ -56,68 +76,139 @@
 
         .nav-link {
             text-decoration: none;
-            color: #4a5568;
+            color: var(--dark);
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             padding: 0.5rem 1rem;
             border-radius: 8px;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .nav-link:hover {
-            background: #f7fafc;
-            color: #4834d4;
+            background: var(--light);
+            color: var(--primary);
         }
 
-        .nav-link i {
-            font-size: 1.1rem;
-        }
-
-        .btn-logout {
-            background: #4834d4;
+        .nav-link.active {
+            background: var(--primary);
             color: white;
-            padding: 0.5rem 1.2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
             border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-info { background: #cce5ff; color: #004085; }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
             font-weight: 500;
             transition: all 0.2s ease;
         }
 
-        .btn-logout:hover {
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
             background: #3c2bb7;
             transform: translateY(-1px);
         }
-
-        /* Ajuste para el contenido debajo del header fijo */
-        body {
-            padding-top: 80px;
-        }
     </style>
-
-    <header class="nav-header">
-        <div class="nav-container">
-            <a href="{{ url_for('home') }}" class="brand">StartPn Jr</a>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('home') }}" class="brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="StartPn Jr">
+                <span>StartPn Jr</span>
+            </a>
             
-            <nav class="nav-links">
-                <a href="{{ url_for('home') }}" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    Inicio
-                </a>
-                <a href="{{ url_for('panel_emprendedor') }}" class="nav-link">
-                    <i class="fas fa-th-large"></i>
-                    Panel
-                </a>
-                <a href="{{ url_for('logout') }}" class="nav-link btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Cerrar sesión
-                </a>
-            </nav>
+            <div class="nav-links">
+                {% if session.get('user') %}
+                    <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                        <i class="fas fa-home"></i> Inicio
+                    </a>
+                    
+                    {% if session.get('rol') == 'Administrador' %}
+                        <a href="{{ url_for('home_admin') }}" class="nav-link {% if request.endpoint == 'home_admin' %}active{% endif %}">
+                            <i class="fas fa-user-shield"></i> Panel Admin
+                        </a>
+                    {% endif %}
+                    
+                    {% if session.get('rol') == 'Emprendedor' %}
+                        <a href="{{ url_for('panel_emprendedor') }}" class="nav-link {% if request.endpoint == 'panel_emprendedor' %}active{% endif %}">
+                            <i class="fas fa-rocket"></i> Mi Panel
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('logout') }}" class="nav-link btn-primary">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    </header>
+    </nav>
 
+    <!-- Contenido principal -->
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Funciones comunes
+        function showLoading(message = 'Procesando...') {
+            Swal.fire({
+                title: message,
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading() }
+            });
+        }
+
+        function showSuccess(message) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: message,
+                timer: 2000
+            });
+        }
+
+        function showError(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

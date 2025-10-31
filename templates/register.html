@@ -308,8 +308,9 @@
                 
                 <div id="alertContainer"></div>
                 
-                <form id="registerForm">
+                <form id="registerForm" method="POST" action="{{ url_for('register') }}">
                     <div class="form-group">
+                        <label for="username">Usuario</label>
                         <input 
                             type="text" 
                             name="username" 
@@ -323,6 +324,7 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="password">Contraseña</label>
                         <div class="input-wrapper">
                             <input 
                                 type="password" 
@@ -354,6 +356,7 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="confirm_password">Confirmar Contraseña</label>
                         <div class="input-wrapper">
                             <input 
                                 type="password" 
@@ -378,7 +381,7 @@
                 </form>
                 
                 <div class="register-forget">
-                    <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+                    <a href="{{ url_for('login') }}">¿Ya tienes cuenta? Inicia sesión</a>
                 </div>
             </div>
             <div class="circle circle-two"></div>

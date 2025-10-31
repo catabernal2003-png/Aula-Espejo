@@ -3,318 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARTPn - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>StartPn Jr - Iniciar Sesión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <style>
-        /* 🔹 RESETEO Y FUENTE BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* ========== LOADER ORIGINAL (sin cambios) ========== */
-        .loader-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 9999;
-            transition: opacity 1s ease;
-        }
-        .loader-screen.hidden { opacity: 0; pointer-events: none; }
-        .loading-container { text-align: center; position: relative; z-index: 10; }
-        .logo-wrapper { position: relative; width: 300px; height: 300px; }
-        .logo-content { display: flex; align-items: center; justify-content: center; animation: pulse 2s ease-in-out infinite; }
-        .bulb {
-            position: absolute;
-            width: 60px; height: 80px;
-            background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            animation: glow 1.5s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-        }
-        .wing {
-            position: absolute;
-            width: 50px; height: 35px;
-            background: #87CEEB;
-            border-radius: 50% 0 50% 0;
-            top: 50%;
-            animation: flap 0.8s ease-in-out infinite;
-        }
-        .wing-left { left: 20px; transform: translateY(-50%) rotate(-20deg); transform-origin: right center; }
-        .wing-right { right: 20px; transform: translateY(-50%) rotate(20deg) scaleX(-1); transform-origin: left center; animation-delay: 0.1s; }
-        .rocket { position: absolute; right: 50px; top: 80px; font-size: 50px; animation: rocketFly 3s ease-in-out infinite; }
-        .spinner {
-            position: absolute; top: 50%; left: 50%;
-            width: 320px; height: 320px;
-            margin: -160px 0 0 -160px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #FFD700;
-            border-right-color: #87CEEB;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-        .brand-name { color: #fff; font-size: 48px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); margin-top: 15px; }
-        .loading-text { margin-top: 30px; color: white; font-size: 22px; font-weight: bold; }
-        .progress-container {
-            width: 300px; height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin: 30px auto 0;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700, #87CEEB, #90EE90);
-            background-size: 200% 100%;
-            animation: progress 3s ease-in-out forwards, shimmer 1.5s linear infinite;
-            border-radius: 10px;
-        }
-        .motivational { margin-top: 40px; color: white; font-size: 16px; font-style: italic; opacity: 0.8; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
-        @keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.6);} 50%{box-shadow:0 0 40px rgba(255,215,0,1);} }
-        @keyframes flap { 0%,100%{transform:translateY(-50%) rotate(-20deg);} 50%{transform:translateY(-50%) rotate(-30deg);} }
-        @keyframes rocketFly { 0%{transform:translate(0,0) rotate(45deg);}50%{transform:translate(60px,-60px) rotate(45deg);}100%{transform:translate(0,0) rotate(45deg);} }
-        @keyframes progress { from{width:0%;}to{width:100%;} }
-        @keyframes shimmer { 0%{background-position:-200% 0;}100%{background-position:200% 0;} }
-
-        /* 🔹 LOGIN SECTION - NUEVO ESTILO */
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-}
-
-
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.1;
-        }
-
-        .circle-one {
-            width: 200px; height: 200px;
-            background: #667eea;
-            top: -100px; right: -100px;
-        }
-
-        .circle-two {
-            width: 150px; height: 150px;
-            background: #764ba2;
-            bottom: -75px; left: -75px;
-        }
-
-        .form-container { position: relative; z-index: 1; }
-
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            background: white;
-            margin-bottom: 15px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .password-container {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #666;
-            transition: color 0.3s;
-        }
-
-        .toggle-password:hover { color: #667eea; }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .link-divider {
-            text-align: center;
-            margin: 20px 0;
-            color: #999;
-            font-size: 0.9rem;
-        }
-
-        .register-forget {
-            text-align: center;
-        }
-
-        .register-forget a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-            display: inline-block;
-            margin: 5px 10px;
-        }
-
-        .register-forget a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .error-message {
-            display: none;
-            color: #e94560;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-            }
-            h1 { font-size: 1.5rem; }
-        }
-    </style>
 </head>
 <body>
+    <div class="login-container">
+        <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="StartPn Jr" class="login-banner">
+        
+        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+            <h2>Iniciar Sesión</h2>
 
-    <!-- 🟣 LOADER STARTPn -->
-    <div class="loader-screen" id="loader">
-        <div class="loading-container">
-            <div class="logo-wrapper">
-                <div class="spinner"></div>
-                <div class="logo-content">
-                    <div class="wing wing-left"></div>
-                    <div class="wing wing-right"></div>
-                    <div class="bulb"></div>
-                </div>
-                <div class="rocket">🚀</div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" required>
             </div>
-            <div class="brand-name">STARTPn Jr</div>
-            <div class="loading-text">Iniciando...</div>
-            <div class="progress-container"><div class="progress-fill"></div></div>
-            <div class="motivational">"Que tu edad no te limite a tener una mente emprendedora"</div>
-        </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit">Ingresar</button>
+
+            <div class="register-forget">
+                <a href="{{ url_for('register') }}">Crear cuenta</a>
+                <a href="{{ url_for('reset_password') }}">¿Olvidaste tu contraseña?</a>
+            </div>
+        </form>
     </div>
 
-    <!-- LOGIN -->
-    <section class="container" id="loginSection" style="opacity:0; transition:opacity 1s ease;">
-        <div class="login-container">
-            <div class="circle circle-one"></div>
-            <div class="form-container">
-                <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="Logo de Login" class="login-banner">
-                <h1>LOGIN</h1>
-
-                <div class="error-message" id="errorMessage">Usuario o contraseña incorrectos</div>
-                
-                <form method="POST" action="/">
-                    <input type="text" name="username" placeholder="USERNAME" required />
-                    <div class="password-container">
-                        <input type="password" name="password" id="password" placeholder="PASSWORD" required />
-                        <span class="toggle-password" onclick="togglePassword()">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                        </span>
-                    </div>
-                    <button type="submit">Iniciar Sesión</button>
-                </form>
-
-                <div class="link-divider">o</div>
-                <div class="register-forget">
-                    <a href="/register" class="register-link">Crear una cuenta</a>
-                    <a href="/forgot-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
-                </div>
-            </div>
-            <div class="circle circle-two"></div>
-        </div>
-    </section>
-
-    <script>
-        // Mostrar login después del loader
-        setTimeout(() => {
-            document.getElementById('loader').classList.add('hidden');
-            document.getElementById('loginSection').style.opacity = 1;
-        }, 3500);
-
-        // Toggle contraseña
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eye-icon');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.innerHTML = `
-                    <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M3 3l18 18"/>
-                `;
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.innerHTML = `
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                `;
-            }
-        }
-    </script>
+    <div class="circle circle-one"></div>
+    <div class="circle circle-two"></div>
 </body>
 </html>
