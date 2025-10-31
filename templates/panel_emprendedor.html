@@ -1,599 +1,601 @@
 {% extends "base.html" %}
-{% block title %}Mi Espacio Emprendedor{% endblock %}
+{% block title %}Mi Espacio — Emprendedor{% endblock %}
 
 {% block content %}
 <style>
-    .dashboard-container {
-        max-width: 1400px;
-        margin: 2rem auto;
-        padding: 0 1.5rem;
-    }
+/* Nueva paleta moderna */
+:root {
+  --primary: #6366f1;      /* Indigo 500 */
+  --secondary: #3b82f6;    /* Blue 500 */
+  --accent: #8b5cf6;       /* Violet 500 */
+  --success: #22c55e;      /* Green 500 */
+  --background: #f8fafc;   /* Slate 50 */
+  --text: #0f172a;         /* Slate 900 */
+  --muted: #64748b;        /* Slate 500 */
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --gradient: linear-gradient(135deg, #6366f1, #3b82f6);
+}
 
-    .welcome-banner {
-        background: linear-gradient(135deg, #e0e0e0 0%, #764ba2 100%);
-        padding: 2.5rem;
-        border-radius: 20px;
-        color: white;
-        margin-bottom: 2rem;
-        box-shadow: 0 15px 30px rgba(118, 75, 162, 0.2);
-    }
+/* Layout */
+.dashboard {
+  max-width: 1280px;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 1.75rem;
+  padding: 0 1.25rem;
+}
 
-    .welcome-banner h1 {
-        font-size: 2.5rem;
-        margin: 0;
-        font-weight: 700;
-    }
+/* Hero / bienvenida */
+.hero {
+  grid-column: 1 / -1;
+  background: var(--hero-bg);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.15);
+}
 
-    .welcome-banner p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-top: 0.5rem;
-    }
+.hero-left h2 {
+  margin: 0;
+  color: var(--hero-title);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-    }
+.hero-left p {
+  margin: 8px 0 0 0;
+  color: var(--hero-sub);
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 580px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
 
-    .panel {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-    }
+/* Perfil (derecha) */
+.user-mini { display:flex; align-items:center; gap:0.9rem; }
+.user-avatar{
+  width:56px;height:56px;border-radius:12px;
+  background: var(--avatar-gradient);
+  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.05rem;
+  box-shadow: 0 8px 22px rgba(79,70,229,0.12);
+}
+.user-name {
+  color: var(--hero-title);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.user-role {
+  color: #ffd700; /* bright gold for role */
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
 
-    .section-title {
-        font-size: 1.5rem;
-        color: #2d3748;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-    }
+/* Cards */
+.card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--card-border);
+}
+.section-title {
+  color: var(--text-dark);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.section-title i {
+  color: var(--primary);
+}
 
-    .section-title i {
-        font-size: 1.8rem;
-        color: #667eea;
-    }
+/* Inputs */
+.form-row{ display:flex; gap:0.75rem; align-items:center; }
+.input, textarea{
+  width:100%; padding:0.9rem 1rem; border-radius:10px; font-size:1rem;
+  border:1.5px solid var(--card-border); color:var(--text); background:#fff;
+}
+.input:focus, textarea:focus{ outline:none; box-shadow:0 8px 30px rgba(79,70,229,0.08); border-color:var(--primary); }
+textarea{ min-height:96px; resize:vertical; }
 
-    .form-control {
-        width: 100%;
-        padding: 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        margin-bottom: 1rem;
-    }
+/* Resources Grid */
+.resources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
 
-    .form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
+.resource {
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
 
-    .btn {
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
+.resource:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
 
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-    }
+.resource h4 {
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
 
-    .btn-danger {
-        background: linear-gradient(135deg, #f6365b 0%, #ff5858 100%);
-        color: white;
-        border: none;
-    }
+.resource p {
+  color: var(--muted-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+}
 
-    .project-card {
-        background: #f8fafc;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
-    }
+.resource a {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(79, 70, 229, 0.1);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
 
-    .project-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    }
+.resource a:hover {
+  background: var(--primary);
+  color: white;
+}
 
-    .project-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.5rem;
-    }
+/* Metrics Cards */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
 
-    .project-desc {
-        color: #64748b;
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-    }
+.metric {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 1.25rem 1rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
 
-    .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
+.metric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+}
 
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem;
-        border-radius: 16px;
-        color: white;
-        text-align: center;
-    }
+.metric .value {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
 
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
+.metric .label {
+  color: var(--muted-dark);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
 
-    .metric-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-    }
+/* Project Cards */
+.project {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
 
-    .file-list {
-        list-style: none;
-        padding: 0;
-    }
+.project:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
 
-    .file-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-bottom: 0.8rem;
-    }
+.project-title {
+  color: var(--text-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
 
-    .file-icon {
-        margin-right: 1rem;
-        color: #667eea;
-    }
+.project-desc {
+  color: var(--muted-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
 
-    .file-info {
-        flex-grow: 1;
-    }
+/* Progress Bar */
+.progress-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
 
-    .file-name {
-        color: #2d3748;
-        font-weight: 500;
-        margin-bottom: 0.2rem;
-    }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.4s ease;
+}
 
-    .file-meta {
-        font-size: 0.85rem;
-        color: #64748b;
-    }
+/* Botones */
+.btn-primary-small {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    .message-list {
-        max-height: 300px;
-        overflow-y: auto;
-    }
+.btn-primary-small:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
 
-    .message-item {
-        padding: 1rem;
-        border-bottom: 1px solid #e2e8f0;
-    }
+.btn-neutral {
+  background: white;
+  color: var(--text-dark);
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    .message-text {
-        color: #2d3748;
-        margin-bottom: 0.5rem;
-    }
+.btn-neutral:hover {
+  background: #f8fafc;
+  border-color: var(--primary);
+  color: var(--primary);
+}
 
-    .message-date {
-        font-size: 0.85rem;
-        color: #64748b;
-    }
+/* Encabezado del tablero */
+.dashboard-header {
+  background: var(--gradient);
+  border-radius: 20px;
+  padding: 2rem;
+  color: white;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
 
-    /* Estilos adicionales */
-    .learning-paths {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('/static/img/pattern.svg') repeat;
+  opacity: 0.1;
+}
 
-    .path-card {
-        background: #f8fafc;
-        padding: 1.5rem;
-        border-radius: 16px;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
+.header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .path-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
+.welcome-text h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
 
-    .path-card i {
-        font-size: 2rem;
-        color: #667eea;
-        margin-bottom: 1rem;
-    }
+.welcome-text p {
+  font-size: 1.1rem;
+  margin: 1rem 0 0;
+  opacity: 0.9;
+  max-width: 600px;
+  line-height: 1.6;
+}
 
-    .progress-bar {
-        background: #e2e8f0;
-        height: 10px;
-        border-radius: 5px;
-        margin: 1rem 0;
-    }
+.user-profile {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
 
-    .progress {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        height: 100%;
-        border-radius: 5px;
-        transition: width 0.3s ease;
-    }
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: var(--gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.2);
+}
 
-    .chatbot-container {
-        height: 300px;
-        display: flex;
-        flex-direction: column;
-    }
+.user-info h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
 
-    .chat-messages {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-    }
+.user-role {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  margin-top: 0.5rem;
+}
 
-    .chat-input {
-        display: flex;
-        gap: 0.5rem;
-    }
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
 
-    .chat-input .form-control {
-        margin-bottom: 0;
-    }
+.stat-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 16px;
+  text-align: center;
+  transition: transform 0.2s;
+  border: 1px solid var(--border);
+}
 
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-    }
+.stat-card:hover {
+  transform: translateY(-5px);
+}
 
-    .activity-list {
-        list-style: none;
-        padding: 0;
-    }
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
 
-    .activity-list li {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e2e8f0;
-        display: flex;
-        justify-content: space-between;
-    }
+.stat-label {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
 
-    .activity-date {
-        color: #64748b;
-        font-size: 0.9rem;
-    }
+/* Responsive */
+@media (max-width:980px){
+  .dashboard{ grid-template-columns:1fr; padding:0 1rem; }
+  .metrics{ grid-template-columns:repeat(3,1fr); }
+  .hero{ flex-direction:column; align-items:flex-start; gap:0.6rem; }
+}
 </style>
 
-<div class="dashboard-container">
-    <div class="welcome-banner">
-        <h1>¡Hola {{ user.username }}! 🌟</h1>
-        <p>Bienvenido a tu espacio para crear, aprender y emprender</p>
+<div class="dashboard-header">
+  <div class="header-content">
+    <div class="welcome-text">
+      <h1>Bienvenido, {{ user.username }}</h1>
+      <p>Gestiona tus proyectos y aprovecha los recursos disponibles para hacer crecer tu emprendimiento.</p>
     </div>
-
-    <div class="dashboard-grid">
-        <div class="main-content">
-            <!-- Módulo de Mi Emprendimiento -->
-            <div class="panel">
-                <h2 class="section-title">
-                    <i class="fas fa-lightbulb"></i>
-                    Mi Emprendimiento
-                </h2>
-                <form action="{{ url_for('crear_proyecto_emprendedor') }}" method="post">
-                    <input type="text" name="title" class="form-control" placeholder="¿Cómo se llama tu idea genial?" required>
-                    <textarea name="description" class="form-control" rows="3" 
-                            placeholder="Cuéntanos sobre tu idea... ¿Qué problema resuelve? ¿A quién ayuda?"></textarea>
-                    <select name="category" class="form-control" required>
-                        <option value="">Selecciona una categoría</option>
-                        <option value="tecnologia">Tecnología</option>
-                        <option value="medio_ambiente">Medio Ambiente</option>
-                        <option value="social">Ayuda Social</option>
-                        <option value="educacion">Educación</option>
-                        <option value="otros">Otros</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">¡Registrar mi idea!</button>
-                </form>
-
-                <!-- Listado de proyectos -->
-                <div style="margin-top: 2rem;">
-                    {% if data.projects %}
-                        {% for p in data.projects %}
-                            <div class="project-card">
-                                <div class="project-title">{{ p.title }}</div>
-                                <div class="project-desc">{{ p.description }}</div>
-                                <div class="project-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: {{ p.progress }}%"></div>
-                                    </div>
-                                    <span>Avance: {{ p.progress }}%</span>
-                                </div>
-                                <div class="project-actions">
-                                    <button class="btn btn-secondary" onclick="actualizarProgreso({{ p.id }})">
-                                        <i class="fas fa-edit"></i> Actualizar
-                                    </button>
-                                    <form action="{{ url_for('eliminar_proyecto', proj_id=p.id) }}" method="post" style="display: inline;">
-                                        <button class="btn btn-danger" type="submit">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="project-card empty-state">
-                            <img src="{{ url_for('static', filename='img/idea.png') }}" alt="¡Crea tu idea!" style="width: 120px;">
-                            <p>¡Aún no has registrado ninguna idea! Comienza creando tu primer proyecto.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Módulo de Recursos de Aprendizaje -->
-            <div class="panel">
-                <h2 class="section-title">
-                    <i class="fas fa-graduation-cap"></i>
-                    Mis Recursos de Aprendizaje
-                </h2>
-                <div class="learning-paths">
-                    <div class="path-card">
-                        <i class="fas fa-rocket"></i>
-                        <h3>Programa de Incubación</h3>
-                        <p>Aprende paso a paso cómo desarrollar tu idea</p>
-                        <a href="#" class="btn btn-primary">Comenzar</a>
-                    </div>
-                    <div class="path-card">
-                        <i class="fas fa-tools"></i>
-                        <h3>Prototipado</h3>
-                        <p>Crea la primera versión de tu producto</p>
-                        <a href="#" class="btn btn-primary">Explorar</a>
-                    </div>
-                    <div class="path-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Mentoría</h3>
-                        <p>Conecta con expertos que te guiarán</p>
-                        <a href="#" class="btn btn-primary">Agendar</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <!-- Módulo de Progreso -->
-            <div class="panel">
-                <h2 class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    Mi Progreso
-                </h2>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-value">{{ data.progress.level }}</div>
-                        <div class="metric-label">Nivel</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">{{ data.progress.points }}</div>
-                        <div class="metric-label">Puntos</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">{{ data.progress.badges }}</div>
-                        <div class="metric-label">Insignias</div>
-                    </div>
-                </div>
-                
-                <!-- Próximas actividades -->
-                <div class="upcoming-activities">
-                    <h3>Próximas Actividades</h3>
-                    <ul class="activity-list">
-                        {% for activity in data.activities %}
-                        <li>
-                            <span class="activity-date">{{ activity.date }}</span>
-                            <span class="activity-title">{{ activity.title }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Módulo de Chat con Iarbis -->
-            <div class="panel">
-                <h2 class="section-title">
-                    <i class="fas fa-robot"></i>
-                    Pregúntale a Iarbis
-                </h2>
-                <div class="chatbot-container">
-                    <div class="chat-messages" id="chatMessages">
-                        <!-- Los mensajes se cargarán dinámicamente -->
-                    </div>
-                    <form id="chatForm" class="chat-input">
-                        <input type="text" 
-                               placeholder="Escribe tu pregunta aquí..." 
-                               class="form-control"
-                               id="chatInput">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+    
+    <div class="user-profile">
+      <div class="avatar">{{ user.username[0]|upper }}</div>
+      <div class="user-info">
+        <h3>{{ user.username }}</h3>
+        <span class="user-role">{{ user.rol }}</span>
+      </div>
     </div>
+  </div>
+
+  <div class="quick-stats">
+    <div class="stat-card">
+      <div class="stat-value">{{ data.progress.level|default(1) }}</div>
+      <div class="stat-label">Nivel Actual</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ data.progress.points|default(0) }}</div>
+      <div class="stat-label">Puntos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ data.progress.badges|default(0) }}</div>
+      <div class="stat-label">Insignias</div>
+    </div>
+  </div>
 </div>
 
-<style>
-/* Estilos adicionales */
-.learning-paths {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
+<div class="dashboard">
+  <!-- Main izquierdo -->
+  <div class="card">
+    <div class="section-title"><i class="fas fa-lightbulb"></i> Mi Emprendimiento</div>
 
-.path-card {
-    background: #f8fafc;
-    padding: 1.5rem;
-    border-radius: 16px;
-    text-align: center;
-    transition: all 0.3s ease;
-}
+    <form action="{{ url_for('crear_proyecto_emprendedor') }}" method="post">
+      <div class="form-row" style="margin-bottom:0.8rem;">
+        <input class="input" name="title" placeholder="Nombre del proyecto" required>
+        <button class="btn-primary-small" type="submit">Crear</button>
+      </div>
+      <textarea name="description" class="input" placeholder="Descripción breve (¿qué hace, para quién?)"></textarea>
+    </form>
 
-.path-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
+    <div style="margin-top:1rem;">
+      {% if data.projects %}
+        {% for p in data.projects %}
+          <div class="project">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="project-title">{{ p.title }}</div>
+              <div style="font-size:0.95rem;color:var(--muted);">Creado: {{ p.created_at[:10] if p.created_at else '' }}</div>
+            </div>
+            <div class="project-desc">{{ p.description }}</div>
 
-.path-card i {
-    font-size: 2rem;
-    color: #667eea;
-    margin-bottom: 1rem;
-}
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-fill" style="width: {{ p.progress|default(0) }}%;"></div>
+            </div>
 
-.progress-bar {
-    background: #e2e8f0;
-    height: 10px;
-    border-radius: 5px;
-    margin: 1rem 0;
-}
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <small style="color:var(--muted);">Progreso: {{ p.progress|default(0) }}%</small>
+              <div style="display:flex;gap:0.6rem;">
+                <button class="btn-primary-small" type="button" onclick="actualizarProgreso({{ p.id }})">Actualizar</button>
+                <form action="{{ url_for('eliminar_proyecto', proj_id=p.id) }}" method="post" style="display:inline;">
+                  <button class="btn-neutral" type="submit">Eliminar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center;padding:1.25rem;color:var(--muted);font-size:1rem;">Aún no tienes proyectos. Crea tu primera idea.</div>
+      {% endif %}
+    </div>
 
-.progress {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.3s ease;
-}
+    <hr style="border:none;border-top:1px solid #f8fafc;margin:1.2rem 0;">
 
-.chatbot-container {
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-}
+    <div class="section-title"><i class="fas fa-book-open"></i> Recursos</div>
+    <div class="resources">
+      <div class="resource">
+        <h4>Programa de Incubación</h4>
+        <p>Fases con actividades guiadas y plantillas. <a href="{{ url_for('programa_incubacion') }}">Ver</a></p>
+      </div>
+      <div class="resource">
+        <h4>Prototipado</h4>
+        <p>Guías prácticas para crear prototipos. <a href="{{ url_for('prototipado') }}">Ir</a></p>
+      </div>
+      <div class="resource">
+        <h4>Mentoría</h4>
+        <p>Agenda sesiones y envía consultas a mentores. <a href="{{ url_for('mentoria') }}">Ver</a></p>
+      </div>
+    </div>
+  </div>
 
-.chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-}
+  <!-- Sidebar derecho -->
+  <aside>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="section-title"><i class="fas fa-chart-line"></i> Mi Progreso</div>
+      <div class="metrics" style="margin-top:0.6rem;">
+        <div class="metric"><div class="value">{{ data.progress.level|default(1) }}</div><div class="label">Nivel</div></div>
+        <div class="metric"><div class="value">{{ data.progress.points|default(0) }}</div><div class="label">Puntos</div></div>
+        <div class="metric"><div class="value">{{ data.progress.badges|default(0) }}</div><div class="label">Insignias</div></div>
+      </div>
 
-.chat-input {
-    display: flex;
-    gap: 0.5rem;
-}
+      <div style="margin-top:1rem;">
+        <div style="font-weight:700;color:var(--text);margin-bottom:0.5rem;">Próximas actividades</div>
+        {% if data.activities %}
+          {% for a in data.activities %}
+            <div class="activity"><span>{{ a.title }}</span><span>{{ a.date }}</span></div>
+          {% endfor %}
+        {% else %}
+          <div style="color:var(--muted);">No hay actividades programadas.</div>
+        {% endif %}
+      </div>
+    </div>
 
-.chat-input .form-control {
-    margin-bottom: 0;
-}
+    <div class="card">
+      <div class="section-title"><i class="fas fa-robot"></i> Iarbis</div>
+      <div style="color:var(--muted);font-size:0.95rem;margin-bottom:0.8rem;">Asistente breve y orientado a recursos.</div>
 
-.empty-state {
-    text-align: center;
-    padding: 2rem;
-}
+      <div class="chat">
+        <div id="messages" class="messages" aria-live="polite"></div>
 
-.activity-list {
-    list-style: none;
-    padding: 0;
-}
-
-.activity-list li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-}
-
-.activity-date {
-    color: #64748b;
-    font-size: 0.9rem;
-}
-</style>
+        <div class="chat-input">
+          <input id="chatText" class="input" placeholder="Pregunta sobre el programa, prototipado o mentoría...">
+          <button id="sendChat" class="btn-primary-small" type="button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
 
 <script>
-// Funcionalidad del chat con Iarbis
-document.getElementById('chatForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    if (message) {
-        // Aquí irá la lógica para enviar el mensaje al backend
-        addMessage('user', message);
-        input.value = '';
-        // Simular respuesta de Iarbis
-        setTimeout(() => {
-            addMessage('bot', '¡Hola! Estoy aquí para ayudarte con tu emprendimiento 😊');
-        }, 1000);
-    }
-});
+// chat funcional (simulado)
+(function(){
+  const messages = document.getElementById('messages');
+  const input = document.getElementById('chatText');
+  const send = document.getElementById('sendChat');
 
-function addMessage(type, text) {
-    const messages = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}-message`;
-    messageDiv.textContent = text;
-    messages.appendChild(messageDiv);
+  function add(type, text){
+    const d = document.createElement('div');
+    d.className = 'msg ' + (type==='user' ? 'user' : 'bot');
+    d.textContent = text;
+    messages.appendChild(d);
     messages.scrollTop = messages.scrollHeight;
-}
+  }
 
-function actualizarProgreso(projectId) {
-    const progress = prompt('Ingresa el nuevo porcentaje de avance (0-100):');
-    if (progress !== null && !isNaN(progress) && progress >= 0 && progress <= 100) {
-        fetch(`/actualizar-progreso/${projectId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ progress: parseInt(progress) })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert('Error al actualizar el progreso: ' + data.error);
-            }
-        })
-        .catch(error => {
-            alert('Error al actualizar el progreso');
-            console.error('Error:', error);
-        });
-    }
-}
+  if (!messages.hasChildNodes()) {
+    add('bot','Hola. Puedo ayudarte a encontrar recursos y guías. Escribe tu pregunta.');
+  }
 
-// Format dates to local format
-document.addEventListener('DOMContentLoaded', function() {
-    const dates = document.querySelectorAll('.activity-date');
-    dates.forEach(date => {
-        const rawDate = date.textContent;
-        const formattedDate = new Date(rawDate).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        date.textContent = formattedDate;
-    });
+  function respuesta(p){
+    p = p.toLowerCase();
+    if (p.includes('incub')) return 'El programa contiene fases: ideación, validación y prototipado. Puedes ver el detalle en "Programa de Incubación".';
+    if (p.includes('prototip')) return 'En Prototipado tienes guías y recursos paso a paso para construir un prototipo.';
+    if (p.includes('mentor')) return 'En Mentoría verás perfiles y horarios; puedes solicitar una sesión desde ahí.';
+    return 'Puedo indicarte recursos o pasos concretos. ¿Qué te interesa: programa, prototipado o mentoría?';
+  }
+
+  function sendMessage(){
+    const text = input.value.trim();
+    if (!text) return;
+    add('user', text);
+    input.value = '';
+    add('bot', 'Procesando…');
+    setTimeout(()=>{
+      const bots = messages.querySelectorAll('.msg.bot');
+      const last = bots[bots.length - 1];
+      last.textContent = respuesta(text);
+    },600);
+  }
+
+  send.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e)=>{ if (e.key==='Enter') sendMessage(); });
+})();
+
+// formatea fechas si son ISO
+document.addEventListener('DOMContentLoaded', ()=> {
+  document.querySelectorAll('.activity span:last-child').forEach(el=>{
+    const t = el.textContent.trim();
+    const d = new Date(t);
+    if (!isNaN(d)) el.textContent = d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+  });
 });
+
+// actualizar progreso (requiere backend)
+function actualizarProgreso(id){
+  const v = prompt('Ingrese avance (%) 0-100:');
+  const n = parseInt(v);
+  if (v === null) return;
+  if (!Number.isInteger(n) || n<0 || n>100) { alert('Valor inválido'); return; }
+  fetch(`/actualizar-progreso/${id}`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({progress:n})
+  }).then(r=>r.json()).then(j=>{
+    if (j.success) location.reload(); else alert(j.error || 'Error');
+  }).catch(()=>alert('Error de conexión'));
+}
 </script>
 {% endblock %}
 
