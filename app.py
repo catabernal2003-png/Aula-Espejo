@@ -654,3 +654,9 @@ def loaddata_command():
     else:
         print("Error de conexión a la base de datos")
 
+if __name__ == '__main__':
+    init_db()  # Crea las tablas si no existen
+    print("✅ Servidor Flask iniciado en http://127.0.0.1:5000")
+    app.run(debug=True)
+
+
