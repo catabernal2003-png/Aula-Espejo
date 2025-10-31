@@ -1,114 +1,194 @@
 {% extends "base.html" %}
-{% block title %}Fase 1 - Emprendedor{% endblock %}
 
 {% block content %}
-<style>
-    .fase-container {
-        max-width: 800px;
-        margin: 60px auto;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 20px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        padding: 40px;
-    }
+<div class="fase1-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3 class="logo">🌟 StartPn Jr</h3>
+    <nav class="menu">
+      <a href="{{ url_for('panel_emprendedor') }}">Inicio</a>
+      <a href="{{ url_for('fase1_emprendedor') }}" class="active">Fase 1</a>
+      <a href="{{ url_for('crear_proyecto_emprendedor') }}">Crear Proyecto</a>
+      <a href="{{ url_for('ver_proyectos_emprendedor') }}">Mis Proyectos</a>
+    </nav>
+  </aside>
 
-    .fase-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-align: center;
-        border-radius: 15px;
-        padding: 20px;
-        font-size: 1.6rem;
-        font-weight: 600;
-        margin-bottom: 30px;
-    }
+  <!-- Contenido principal -->
+  <main class="main">
+    <header class="header">
+      <h2>Panel del Emprendedor — Fase 1</h2>
+      <p>Gestiona tus proyectos dentro de esta fase del programa.</p>
+    </header>
 
-    .fase-section h4 {
-        color: #333;
-        margin-bottom: 15px;
-        font-weight: 600;
-    }
+    <section class="welcome">
+      <h4>¡Bienvenido, {{ user.username if user else '' }}! 👋</h4>
+      <p>Aquí puedes crear nuevos proyectos y ver tu progreso en StartPn Jr.</p>
+    </section>
 
-    .fase-section p {
-        color: #555;
-        font-size: 1rem;
-        line-height: 1.6;
-    }
+    <section class="cards">
+      <div class="card">
+        <div class="icon"><i class="fas fa-lightbulb"></i></div>
+        <h5>Crear Proyecto</h5>
+        <p>Registra una nueva idea y comienza a desarrollarla paso a paso.</p>
+        <a href="{{ url_for('crear_proyecto_emprendedor') }}" class="btn">Ir</a>
+      </div>
 
-    .btn-volver {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 10px;
-        color: white;
-        padding: 12px 20px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        transition: 0.3s ease;
-    }
+      <div class="card">
+        <div class="icon"><i class="fas fa-folder-open"></i></div>
+        <h5>Ver Proyectos</h5>
+        <p>Consulta tus proyectos activos y revisa su progreso.</p>
+        <a href="{{ url_for('ver_proyectos_emprendedor') }}" class="btn">Ir</a>
+      </div>
 
-    .btn-volver:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
-    }
-</style>
-<div class="text-end mb-3">
-    <a href="{{ url_for('panel_emprendedor') }}" class="btn btn-volver-top">
-        🏠 Ir al Panel
-    </a>
+      <div class="card">
+        <div class="icon"><i class="fas fa-chart-line"></i></div>
+        <h5>Mi Progreso</h5>
+        <p>Visualiza tus avances y logros dentro del programa.</p>
+        <a href="{{ url_for('panel_emprendedor') }}" class="btn">Ver</a>
+      </div>
+    </section>
+  </main>
 </div>
 
 <style>
-    .btn-volver-top {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 10px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
-    }
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f5f6ff;
+  margin: 0;
+}
 
-    .btn-volver-top:hover {
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
-    }
+/* Layout */
+.fase1-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 230px;
+  background: linear-gradient(180deg, #6c63ff, #8b83ff);
+  color: #fff;
+  padding: 2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar .logo {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+}
+
+.menu a {
+  display: block;
+  color: #eee;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.menu a:hover,
+.menu a.active {
+  background: #fff;
+  color: #6c63ff;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 2.5rem 3rem;
+}
+
+.header h2 {
+  color: #2d2d2d;
+  margin-bottom: 0.4rem;
+}
+
+.header p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.welcome {
+  background: #fff;
+  border-left: 5px solid #6c63ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #6c63ff, #8a84ff);
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 10px;
+  background: #6c63ff;
+  color: #fff;
+  padding: 8px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #5750e0;
+  transform: scale(1.05);
+}
+
+@media (max-width: 992px) {
+  .fase1-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .main {
+    padding: 1.5rem;
+  }
+}
 </style>
 
-<div class="fase-container">
-    <div class="fase-header">
-        🚀 Fase 1: Introducción al Emprendimiento
-    </div>
-
-    <div class="fase-section">
-        <h4>💡 Objetivo de esta fase</h4>
-        <p>
-            En esta primera fase, podrás reflexionar sobre tu idea de negocio, definir tus objetivos
-            y comprender los pasos iniciales que todo emprendedor debe seguir.
-        </p>
-    </div>
-
-    <div class="fase-section mt-4">
-        <h4>📋 Actividades sugeridas</h4>
-        <ul>
-            <li>Define tu idea principal de emprendimiento.</li>
-            <li>Identifica a tu público objetivo.</li>
-            <li>Escribe un breve resumen de tu propuesta de valor.</li>
-        </ul>
-    </div>
-
-    <div class="fase-section mt-4">
-        <h4>🧠 Consejo</h4>
-        <p>
-            No te preocupes si tu idea aún no está perfecta. Lo más importante es empezar.
-            Cada paso te acercará más a hacerla realidad 💪.
-        </p>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="{{ url_for('panel_emprendedor') }}" class="btn btn-volver">⬅️ Volver al Panel</a>
-    </div>
-</div>
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
 {% endblock %}
+
+
+
+
+

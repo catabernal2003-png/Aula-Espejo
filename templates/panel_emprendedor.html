@@ -3,18 +3,20 @@
 
 {% block content %}
 <style>
-/* Nueva paleta moderna */
-:root {
-  --primary: #6366f1;      /* Indigo 500 */
-  --secondary: #3b82f6;    /* Blue 500 */
-  --accent: #8b5cf6;       /* Violet 500 */
-  --success: #22c55e;      /* Green 500 */
-  --background: #f8fafc;   /* Slate 50 */
-  --text: #0f172a;         /* Slate 900 */
-  --muted: #64748b;        /* Slate 500 */
+/* Paleta y variables (consistentes) */
+:root{
+  --primary: #6366f1;
+  --accent: #3b82f6;
+  --warm: #fb923c;
+  --background: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
   --card-bg: #ffffff;
-  --border: #e2e8f0;
-  --gradient: linear-gradient(135deg, #6366f1, #3b82f6);
+  --card-border: #e6eefb;
+  --hero-bg: linear-gradient(135deg, rgba(99,102,241,0.16), rgba(59,130,246,0.06));
+  --hero-title: #ffffff;
+  --hero-sub: rgba(255,255,255,0.92);
+  --avatar-gradient: linear-gradient(135deg,#6366f1,#3b82f6);
 }
 
 /* Layout */
@@ -25,273 +27,20 @@
   grid-template-columns: 2.2fr 1fr;
   gap: 1.75rem;
   padding: 0 1.25rem;
+  color: var(--text);
+  background: transparent;
 }
 
-/* Hero / bienvenida */
-.hero {
-  grid-column: 1 / -1;
-  background: var(--hero-bg);
-  border-radius: 16px;
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 8px 24px rgba(15,23,42,0.15);
-}
-
-.hero-left h2 {
-  margin: 0;
-  color: var(--hero-title);
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.hero-left p {
-  margin: 8px 0 0 0;
-  color: var(--hero-sub);
-  font-size: 1rem;
-  line-height: 1.5;
-  max-width: 580px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-/* Perfil (derecha) */
-.user-mini { display:flex; align-items:center; gap:0.9rem; }
-.user-avatar{
-  width:56px;height:56px;border-radius:12px;
-  background: var(--avatar-gradient);
-  display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.05rem;
-  box-shadow: 0 8px 22px rgba(79,70,229,0.12);
-}
-.user-name {
-  color: var(--hero-title);
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-.user-role {
-  color: #ffd700; /* bright gold for role */
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Cards */
-.card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--card-border);
-}
-.section-title {
-  color: var(--text-dark);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-.section-title i {
-  color: var(--primary);
-}
-
-/* Inputs */
-.form-row{ display:flex; gap:0.75rem; align-items:center; }
-.input, textarea{
-  width:100%; padding:0.9rem 1rem; border-radius:10px; font-size:1rem;
-  border:1.5px solid var(--card-border); color:var(--text); background:#fff;
-}
-.input:focus, textarea:focus{ outline:none; box-shadow:0 8px 30px rgba(79,70,229,0.08); border-color:var(--primary); }
-textarea{ min-height:96px; resize:vertical; }
-
-/* Resources Grid */
-.resources {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1rem;
-}
-
-.resource {
-  background: linear-gradient(to bottom, #ffffff, #f8fafc);
-  padding: 1.25rem;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  transition: all 0.3s ease;
-}
-
-.resource:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.resource h4 {
-  color: var(--text-dark);
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-}
-
-.resource p {
-  color: var(--muted-dark);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.resource a {
-  display: inline-block;
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-  margin-top: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: rgba(79, 70, 229, 0.1);
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.resource a:hover {
-  background: var(--primary);
-  color: white;
-}
-
-/* Metrics Cards */
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.metric {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  padding: 1.25rem 1rem;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid var(--card-border);
-  transition: all 0.3s ease;
-}
-
-.metric:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
-}
-
-.metric .value {
-  color: var(--primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.metric .label {
-  color: var(--muted-dark);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* Project Cards */
-.project {
-  background: white;
-  border-radius: 12px;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid var(--card-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.project:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.project-title {
-  color: var(--text-dark);
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.project-desc {
-  color: var(--muted-dark);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* Progress Bar */
-.progress-track {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 1rem 0;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  transition: width 0.4s ease;
-}
-
-/* Botones */
-.btn-primary-small {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-primary-small:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-}
-
-.btn-neutral {
-  background: white;
-  color: var(--text-dark);
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-neutral:hover {
-  background: #f8fafc;
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* Encabezado del tablero */
+/* Dashboard header (welcome) */
 .dashboard-header {
-  background: var(--gradient);
+  background: var(--hero-bg);
   border-radius: 20px;
   padding: 2rem;
-  color: white;
+  color: var(--hero-title);
   margin-bottom: 2rem;
   position: relative;
   overflow: hidden;
-}
-
-.dashboard-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('/static/img/pattern.svg') repeat;
-  opacity: 0.1;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .header-content {
@@ -300,102 +49,167 @@ textarea{ min-height:96px; resize:vertical; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .welcome-text h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.02em;
+  color: var(--hero-title);
 }
 
 .welcome-text p {
-  font-size: 1.1rem;
-  margin: 1rem 0 0;
-  opacity: 0.9;
-  max-width: 600px;
-  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0.6rem 0 0;
+  color: var(--hero-sub);
+  max-width: 680px;
+  line-height: 1.5;
 }
 
+/* Profile box */
 .user-profile {
   text-align: center;
-  padding: 1.5rem;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.2);
+  padding: 1rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  background: var(--gradient);
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: var(--avatar-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: white;
-  margin: 0 auto 1rem;
-  box-shadow: 0 8px 20px rgba(99,102,241,0.2);
+  margin: 0 auto 0.6rem;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.12);
 }
 
 .user-info h3 {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 600;
   margin: 0;
+  color: white;
 }
 
 .user-role {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  background: rgba(255,255,255,0.2);
+  margin-top: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  background: rgba(255,255,255,0.08);
   border-radius: 999px;
-  font-size: 0.875rem;
-  font-weight: 500;
   color: white;
-  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
-.quick-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-
-.stat-card {
+/* Cards */
+.card {
   background: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: 16px;
-  text-align: center;
-  transition: transform 0.2s;
-  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 6px 18px rgba(12,18,30,0.04);
+  border: 1px solid var(--card-border);
+  color: var(--text);
 }
 
-.stat-card:hover {
-  transform: translateY(-5px);
-}
-
-.stat-value {
-  font-size: 2rem;
+.section-title {
   font-weight: 700;
-  color: var(--primary);
-  line-height: 1;
+  color: var(--text);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
 }
 
-.stat-label {
-  color: var(--muted);
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
+/* Inputs */
+.form-row { display:flex; gap:0.75rem; align-items:center; }
+.input, textarea {
+  width:100%;
+  padding:0.9rem 1rem;
+  border-radius:10px;
+  font-size:1rem;
+  border:1.5px solid var(--card-border);
+  color:var(--text);
+  background:#fff;
 }
+.input:focus, textarea:focus {
+  outline:none;
+  box-shadow:0 8px 30px rgba(99,102,241,0.08);
+  border-color:var(--primary);
+}
+textarea { min-height:96px; resize:vertical; }
+
+/* Resources Grid */
+.resources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+.resource {
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(to bottom, #ffffff, #fbfdff);
+  border: 1px solid var(--card-border);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.resource:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(12,18,30,0.06); }
+.resource h4 { margin: 0 0 0.5rem; color: var(--text); font-size:1.02rem; }
+.resource p { margin:0; color: var(--muted); font-size:0.95rem; }
+.resource a { color: var(--primary); font-weight: 700; text-decoration: none; }
+.resource a:hover { color: var(--accent); }
+
+/* Metrics */
+.metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:0.9rem; margin-top:0.6rem; }
+.metric {
+  padding: 1rem;
+  border-radius: 12px;
+  text-align:center;
+  background: linear-gradient(180deg,#fbfdff,#f7f9fc);
+  border:1px solid var(--card-border);
+}
+.metric .value { color:var(--primary); font-weight:800; font-size:1.25rem; }
+.metric .label { color:var(--muted); font-size:0.9rem; }
+
+/* Projects */
+.project {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: #fff;
+  margin-bottom: 0.9rem;
+}
+.project-title { font-weight:700; color:var(--text); font-size:1.05rem; }
+.project-desc { color:var(--muted); margin-top:6px; font-size:0.95rem; }
+
+/* Progress */
+.progress-track { height:10px; background:#eef6fd; border-radius:999px; overflow:hidden; margin:0.75rem 0; }
+.progress-fill { height:100%; background: linear-gradient(90deg,var(--primary),var(--accent)); transition: width .4s ease; }
+
+/* Buttons */
+.btn-primary-small { background: linear-gradient(90deg,var(--primary),var(--accent)); color:#fff; padding:0.65rem 0.9rem; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
+.btn-neutral { background:#fff; border:1px solid var(--card-border); padding:0.6rem 0.9rem; border-radius:8px; cursor:pointer; color:var(--text); }
+
+/* Chat */
+.chat { display:flex; flex-direction:column; gap:0.6rem; height:360px; }
+.messages { flex:1; overflow:auto; padding:1rem; background:#fbfdff; border-radius:12px; border:1px solid var(--card-border); }
+.msg { padding:0.6rem 0.9rem; border-radius:12px; max-width:86%; margin:0.45rem 0; font-size:0.95rem; line-height:1.35; }
+.msg.user { background: rgba(99,102,241,0.08); margin-left:auto; color:var(--text); }
+.msg.bot  { background:#fff; border:1px solid var(--card-border); color:var(--text); }
 
 /* Responsive */
 @media (max-width:980px){
-  .dashboard{ grid-template-columns:1fr; padding:0 1rem; }
-  .metrics{ grid-template-columns:repeat(3,1fr); }
-  .hero{ flex-direction:column; align-items:flex-start; gap:0.6rem; }
+  .dashboard { grid-template-columns: 1fr; padding: 0 1rem; }
+  .metrics { grid-template-columns: repeat(3,1fr); }
 }
 </style>
 
@@ -405,28 +219,28 @@ textarea{ min-height:96px; resize:vertical; }
       <h1>Bienvenido, {{ user.username }}</h1>
       <p>Gestiona tus proyectos y aprovecha los recursos disponibles para hacer crecer tu emprendimiento.</p>
     </div>
-    
+
     <div class="user-profile">
       <div class="avatar">{{ user.username[0]|upper }}</div>
       <div class="user-info">
         <h3>{{ user.username }}</h3>
-        <span class="user-role">{{ user.rol }}</span>
+        <div class="user-role">{{ user.rol }}</div>
       </div>
     </div>
   </div>
 
-  <div class="quick-stats">
-    <div class="stat-card">
-      <div class="stat-value">{{ data.progress.level|default(1) }}</div>
-      <div class="stat-label">Nivel Actual</div>
+  <div class="quick-stats" style="margin-top:1.25rem; display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
+    <div class="stat-card card" style="padding:1rem;">
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.level|default(1) }}</div>
+      <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Nivel Actual</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-value">{{ data.progress.points|default(0) }}</div>
-      <div class="stat-label">Puntos</div>
+    <div class="stat-card card" style="padding:1rem;">
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.points|default(0) }}</div>
+      <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Puntos</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-value">{{ data.progress.badges|default(0) }}</div>
-      <div class="stat-label">Insignias</div>
+    <div class="stat-card card" style="padding:1rem;">
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.badges|default(0) }}</div>
+      <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Insignias</div>
     </div>
   </div>
 </div>
@@ -460,9 +274,16 @@ textarea{ min-height:96px; resize:vertical; }
 
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <small style="color:var(--muted);">Progreso: {{ p.progress|default(0) }}%</small>
-              <div style="display:flex;gap:0.6rem;">
+              <div style="display:flex;gap:0.6rem;align-items:center;">
                 <button class="btn-primary-small" type="button" onclick="actualizarProgreso({{ p.id }})">Actualizar</button>
-                <form action="{{ url_for('eliminar_proyecto', proj_id=p.id) }}" method="post" style="display:inline;">
+
+                <button class="btn-primary-small" type="button"
+                  onclick="analizarExito({{ p.id }}, '{{ p.title|e }}')">
+                  Analizar éxito
+                </button>
+
+                <form action="{{ url_for('eliminar_proyecto', proj_id=p.id) }}" method="post" style="display:inline;"
+                      onsubmit="return confirm('¿Seguro que deseas eliminar el proyecto \"{{ p.title|e }}\"? Esta acción no se puede deshacer.');">
                   <button class="btn-neutral" type="submit">Eliminar</button>
                 </form>
               </div>
@@ -474,7 +295,7 @@ textarea{ min-height:96px; resize:vertical; }
       {% endif %}
     </div>
 
-    <hr style="border:none;border-top:1px solid #f8fafc;margin:1.2rem 0;">
+    <hr style="border:none;border-top:1px solid var(--card-border);margin:1.2rem 0;">
 
     <div class="section-title"><i class="fas fa-book-open"></i> Recursos</div>
     <div class="resources">
@@ -522,7 +343,7 @@ textarea{ min-height:96px; resize:vertical; }
       <div class="chat">
         <div id="messages" class="messages" aria-live="polite"></div>
 
-        <div class="chat-input">
+        <div class="chat-input" style="display:flex;gap:0.6rem;">
           <input id="chatText" class="input" placeholder="Pregunta sobre el programa, prototipado o mentoría...">
           <button id="sendChat" class="btn-primary-small" type="button"><i class="fas fa-paper-plane"></i></button>
         </div>
@@ -595,6 +416,68 @@ function actualizarProgreso(id){
   }).then(r=>r.json()).then(j=>{
     if (j.success) location.reload(); else alert(j.error || 'Error');
   }).catch(()=>alert('Error de conexión'));
+}
+
+async function analizarExito(projId, title){
+  // mostrar spinner mínimo
+  const overlayId = 'analyze-overlay-' + projId;
+  // crear caja resultado si no existe
+  let box = document.getElementById(overlayId);
+  if (!box) {
+    box = document.createElement('div');
+    box.id = overlayId;
+    box.style.position = 'fixed';
+    box.style.right = '20px';
+    box.style.bottom = '20px';
+    box.style.maxWidth = '360px';
+    box.style.zIndex = 9999;
+    box.style.background = '#fff';
+    box.style.border = '1px solid rgba(15,23,42,0.08)';
+    box.style.borderRadius = '12px';
+    box.style.padding = '14px';
+    box.style.boxShadow = '0 10px 30px rgba(12,18,30,0.12)';
+    document.body.appendChild(box);
+  }
+  box.innerHTML = '<strong>Analizando: </strong>' + title + '<div style="margin-top:8px;color:#6b7280">Consultando modelo…</div>';
+
+  try {
+    const resp = await fetch(`/predict_success/${projId}`);
+    const json = await resp.json();
+    if (!json.success) {
+      box.innerHTML = '<strong>Error</strong><div style="margin-top:8px;color:#b91c1c">'+ (json.error||'Error desconocido') +'</div>';
+      setTimeout(()=>box.remove(), 6000);
+      return;
+    }
+    const r = json.result;
+    // format probs
+    const probs = r.probs;
+    let probsHtml = '<ul style="padding-left:18px;margin:8px 0">';
+    for (const cls in probs){
+      const pct = (probs[cls]*100).toFixed(1);
+      probsHtml += `<li style="margin:4px 0;"><strong>${cls}:</strong> ${pct}%</li>`;
+    }
+    probsHtml += '</ul>';
+
+    // numeric importance top 3
+    const imp = r.numeric_importance || [];
+    const impTop = imp.slice(0,3).map(x=>`<li style="margin:4px 0;">${x[0]}: ${parseFloat(x[1]).toFixed(3)}</li>`).join('');
+
+    box.innerHTML = `
+      <div style="font-weight:700;margin-bottom:6px;">Resultado — ${r.label}</div>
+      <div style="color:#374151;font-size:0.95rem;">Probabilidades:</div>
+      ${probsHtml}
+      <div style="color:#374151;font-size:0.95rem;margin-top:6px;">Variables (num.) más influyentes:</div>
+      <ul style="padding-left:18px;margin:8px 0;">${impTop || '<li style="color:#6b7280">No disponible</li>'}</ul>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <button style="background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;" onclick="this.parentElement.parentElement.remove()">Cerrar</button>
+      </div>
+    `;
+    // autohide después de cierto tiempo (opcional)
+    setTimeout(()=>{ try{ box.remove() }catch(e){} }, 20000);
+  } catch (err) {
+    box.innerHTML = '<strong>Error de conexión</strong><div style="margin-top:8px;color:#b91c1c">'+ err.message +'</div>';
+    setTimeout(()=>box.remove(), 6000);
+  }
 }
 </script>
 {% endblock %}

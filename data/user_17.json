@@ -1,11 +1,12 @@
 {
   "projects": [
     {
-      "id": 1761902196,
-      "title": "materas recicladas",
-      "description": "mediante el proceso del reciclaje hacemos materas",
-      "created_at": "2025-10-31T04:16:36.549197",
-      "progress": 5
+      "id": 1761971916,
+      "title": "futbol",
+      "description": "hola",
+      "category": "",
+      "progress": 5,
+      "created_at": "2025-10-31T23:38:36.825466"
     }
   ],
   "files": [],

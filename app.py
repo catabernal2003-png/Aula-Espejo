@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import mysql.connector
 from mysql.connector import Error
+from ml_model_multiclass import train_model, predict_project, MODEL_PATH
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_aqui'
@@ -516,28 +517,65 @@ def exportar_usuarios():
     return "Función de exportar usuarios"
 
 @app.route('/fase1')
-@app.route('/fase1')
 def fase1():
     if 'user_id' not in session:
         flash('Debes iniciar sesión para acceder a esta página', 'error')
         return redirect(url_for('login'))
 
-    # Verificamos que sea un emprendedor
-    if session.get('rol') != 'Emprendedor':
-        flash('No tienes permiso para acceder a esta sección.', 'error')
-        return redirect(url_for('home'))
+    rol = session.get('rol')
+    user_id = session['user_id']
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    user_id = session['user_id']
-
     cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
     user = cursor.fetchone()
-
     cursor.close()
     connection.close()
 
-    return render_template('fase1_emprendedor.html', user=user)
+    # Si es administrador, cargar todos los proyectos de los usuarios emprendedores
+    if rol == 'Administrador':
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT id, username FROM users WHERE rol_id = 2")  # 2 = Emprendedor
+        emprendedores = cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+        proyectos = []
+        for emp in emprendedores:
+            data = load_user_data(emp['id'])
+            for p in data.get('projects', []):
+                proyectos.append({
+                    'user': emp['username'],
+                    'title': p.get('title', 'Sin título'),
+                    'description': p.get('description', ''),
+                    'progress': p.get('progress', 0),
+                    'created_at': p.get('created_at', '')
+                })
+
+        # --- 📊 Calcular estadísticas para el panel ---
+        total_emprendedores = len(emprendedores)
+        total_proyectos = len(proyectos)
+        promedio_progreso = round(
+            sum(p['progress'] for p in proyectos) / total_proyectos, 1
+        ) if total_proyectos > 0 else 0
+
+        return render_template(
+            'fase1_admin.html',
+            user=user,
+            proyectos=proyectos,
+            total_emprendedores=total_emprendedores,
+            total_proyectos=total_proyectos,
+            promedio_progreso=promedio_progreso
+        )
+
+    elif rol == 'Emprendedor':
+        return render_template('fase1_emprendedor.html', user=user)
+
+    else:
+        flash('No tienes permiso para acceder a esta sección.', 'error')
+        return redirect(url_for('home'))
+
 
 
 @app.route('/fase2')
@@ -579,6 +617,76 @@ def crear_proyecto_emprendedor():
     flash('¡Proyecto creado exitosamente!', 'success')
     
     return redirect(url_for('panel_emprendedor'))
+
+@app.route('/fase1_emprendedor')
+def fase1_emprendedor():
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    return render_template('fase1_emprendedor.html', user=user)
+
+
+@app.route('/ver_proyectos_emprendedor')
+def ver_proyectos_emprendedor():
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    data = load_user_data(user_id)
+    proyectos = data.get('projects', [])
+
+    # Asignar IDs únicos si no los tienen
+    for i, p in enumerate(proyectos):
+        p['id'] = i + 1
+
+    return render_template('ver_proyectos_emprendedor.html', proyectos=proyectos)
+
+@app.route('/crear_proyecto', methods=['GET', 'POST'])
+def crear_proyecto():
+    # Solo permite el acceso a emprendedores
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        progress = int(request.form.get('progress', 0))
+
+        data = load_user_data(user_id)
+        projects = data.get('projects', [])
+
+        # Crear nuevo proyecto
+        new_project = {
+            'id': len(projects) + 1,
+            'title': title,
+            'description': description,
+            'progress': progress,
+            'created_at': datetime.now().strftime('%Y-%m-%d')
+        }
+
+        projects.append(new_project)
+        data['projects'] = projects
+        save_user_data(user_id, data)
+
+        flash('✅ Proyecto creado exitosamente.', 'success')
+        return redirect(url_for('ver_proyectos_emprendedor'))
+
+    # Si es GET, mostrar el formulario
+    return render_template('crear_proyecto.html')
+
 
 @app.route('/eliminar_proyecto/<int:proj_id>', methods=['POST'])
 def eliminar_proyecto(proj_id):
@@ -623,6 +731,14 @@ def prototipado():
             ]
         }
     )
+
+@app.route('/home_emprendedor')
+def home_emprendedor():
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
+    return redirect(url_for('panel_emprendedor'))
+
 
 @app.route('/mentoria')
 def mentoria():
@@ -670,6 +786,8 @@ def initdb_command():
     init_db()
     click.echo('Base de datos inicializada.')
 
+
+
 # Cargar datos iniciales
 @app.cli.command('loaddata')
 def loaddata_command():
@@ -703,6 +821,79 @@ def loaddata_command():
             connection.close()
     else:
         print("Error de conexión a la base de datos")
+
+
+# Ruta para entrenar (usar en desarrollo; proteger en producción)
+@app.route('/train_success_model', methods=['POST'])
+def route_train_success_model():
+    """
+    Entrena el modelo de predicción de éxito.
+    Solo accesible por administradores.
+    Espera que exista el archivo data/success_training.csv
+    con una columna 'outcome' (0/1/2 o etiquetas).
+    """
+    # Protección de acceso
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        return jsonify({'success': False, 'error': 'No autorizado. Solo administradores.'}), 403
+
+    csv_path = os.path.join('data', 'success_training.csv')
+    if not os.path.exists(csv_path):
+        return jsonify({'success': False, 'error': 'CSV de entrenamiento no encontrado en data/success_training.csv'}), 400
+
+    try:
+        model_path = train_model(csv_path)
+        return jsonify({'success': True, 'model_path': model_path})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# --- ENDPOINT DE PREDICCIÓN DE ÉXITO ---
+@app.route('/predict_success/<int:proj_id>', methods=['GET'])
+def route_predict_success(proj_id):
+    """
+    Realiza la predicción del nivel de éxito de un proyecto específico del usuario logueado.
+    Requiere haber entrenado previamente el modelo.
+    """
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+
+    user_id = session['user_id']
+
+    def get_project_by_id(pid, uid):
+        """Obtiene un proyecto guardado del usuario desde data/user_<id>.json."""
+        data = load_user_data(uid)
+        for p in data.get('projects', []):
+            if p.get('id') == pid:
+                return p
+        return None
+
+    project = get_project_by_id(proj_id, user_id)
+    if not project:
+        return jsonify({'success': False, 'error': 'Proyecto no encontrado'}), 404
+
+    try:
+        res = predict_project({
+            'description': project.get('description', ''),
+            'progress': project.get('progress', 0),
+            'created_at': project.get('created_at', '')
+        })
+        return jsonify({'success': True, 'result': res})
+    except FileNotFoundError:
+        return jsonify({'success': False, 'error': 'Modelo no entrenado. Usa /train_success_model'}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# --- RUTA VISUAL PARA ENTRENAR EL MODELO (desde el panel del admin) ---
+@app.route('/admin/train_model', methods=['GET'])
+def admin_train_model():
+    """
+    Muestra una vista con un botón para entrenar el modelo.
+    Solo accesible para administradores.
+    """
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+    return render_template('admin_train_model.html', user=session['username'])
 
 if __name__ == '__main__':
     init_db()  # Crea las tablas si no existen

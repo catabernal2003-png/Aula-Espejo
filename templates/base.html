@@ -135,35 +135,34 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="navbar-container">
-            <a href="{{ url_for('home') }}" class="brand">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="StartPn Jr">
-                <span>StartPn Jr</span>
-            </a>
-            
-            <div class="nav-links">
-                {% if session.get('user') %}
-                    <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
-                        <i class="fas fa-home"></i> Inicio
-                    </a>
-                    
-                    {% if session.get('rol') == 'Administrador' %}
-                        <a href="{{ url_for('home_admin') }}" class="nav-link {% if request.endpoint == 'home_admin' %}active{% endif %}">
-                            <i class="fas fa-user-shield"></i> Panel Admin
-                        </a>
-                    {% endif %}
-                    
-                    {% if session.get('rol') == 'Emprendedor' %}
-                        <a href="{{ url_for('panel_emprendedor') }}" class="nav-link {% if request.endpoint == 'panel_emprendedor' %}active{% endif %}">
-                            <i class="fas fa-rocket"></i> Mi Panel
-                        </a>
-                    {% endif %}
-                    
-                    <a href="{{ url_for('logout') }}" class="nav-link btn-primary">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+        <div class="brand">
+            <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="StartPn Jr" class="Fondo login">
+            <!-- Mantener solo la versión en negrita -->
+            <span class="brand-name"><strong>StartPn Jr</strong></span>
+            <!-- Quitar cualquier otra línea que contenga "StartPn Jr" duplicada -->
+        </div>
+        <div class="nav-links">
+            {% if session.get('user') %}
+                <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                
+                {% if session.get('rol') == 'Administrador' %}
+                    <a href="{{ url_for('home_admin') }}" class="nav-link {% if request.endpoint == 'home_admin' %}active{% endif %}">
+                        <i class="fas fa-user-shield"></i> Panel Admin
                     </a>
                 {% endif %}
-            </div>
+                
+                {% if session.get('rol') == 'Emprendedor' %}
+                    <a href="{{ url_for('panel_emprendedor') }}" class="nav-link {% if request.endpoint == 'panel_emprendedor' %}active{% endif %}">
+                        <i class="fas fa-rocket"></i> Mi Panel
+                    </a>
+                {% endif %}
+                
+                <a href="{{ url_for('logout') }}" class="nav-link btn-primary">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            {% endif %}
         </div>
     </nav>
 
