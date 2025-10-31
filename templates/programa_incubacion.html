@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="program-container">
+    <h1>Programa de Incubación</h1>
+    
+    <div class="phases-grid">
+        {% for fase in programa.fases %}
+        <div class="phase-card">
+            <h3>{{ fase.nombre }}</h3>
+            <p>{{ fase.descripcion }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="timeline">
+        <!-- Add program timeline here -->
+    </div>
+</div>
+{% endblock %}

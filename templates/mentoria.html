@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mentoria-container">
+    <div class="welcome-banner">
+        <h1>Programa de Mentoría</h1>
+        <p>Conecta con expertos que te guiarán en tu camino emprendedor</p>
+    </div>
+
+    <div class="mentores-grid">
+        {% for mentor in mentores %}
+        <div class="mentor-card">
+            <div class="mentor-info">
+                <h3>{{ mentor.nombre }}</h3>
+                <p class="especialidad">{{ mentor.especialidad }}</p>
+                <div class="horarios">
+                    <h4>Horarios disponibles:</h4>
+                    <ul>
+                        {% for horario in mentor.horarios %}
+                        <li>{{ horario }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="mentor-actions">
+                <button class="btn btn-primary" onclick="agendarMentoria('{{ mentor.nombre }}')">
+                    Agendar mentoría
+                </button>
+                <button class="btn btn-secondary" onclick="abrirChat('{{ mentor.nombre }}')">
+                    Enviar mensaje
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- En panel_emprendedor.html, actualiza los enlaces de las tarjetas -->
+    <div class="path-card">
+        <a href="{{ url_for('programa_incubacion') }}">
+            <i class="fas fa-rocket"></i>
+            <h3>Programa de Incubación</h3>
+            <p>Aprende paso a paso cómo desarrollar tu idea</p>
+        </a>
+    </div>
+
+    <div class="path-card">
+        <a href="{{ url_for('prototipado') }}">
+            <i class="fas fa-tools"></i>
+            <h3>Prototipado</h3>
+            <p>Crea la primera versión de tu producto</p>
+        </a>
+    </div>
+
+    <div class="path-card">
+        <a href="{{ url_for('mentoria') }}">
+            <i class="fas fa-users"></i>
+            <h3>Mentoría</h3>
+            <p>Conecta con expertos que te guiarán</p>
+        </a>
+    </div>
+</div>
+
+<style>
+.mentoria-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.mentores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.mentor-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mentor-info h3 {
+    margin: 0;
+    color: #2d3748;
+}
+
+.especialidad {
+    color: #4834d4;
+    font-weight: 500;
+    margin: 0.5rem 0;
+}
+
+.horarios {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.horarios ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.mentor-actions {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+}
+</style>
+
+<script>
+function agendarMentoria(mentor) {
+    alert(`Próximamente: Agendar mentoría con ${mentor}`);
+}
+
+function abrirChat(mentor) {
+    alert(`Próximamente: Chat con ${mentor}`);
+}
+</script>
+{% endblock %}

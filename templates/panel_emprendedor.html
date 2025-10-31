@@ -1,138 +1,599 @@
 {% extends "base.html" %}
-{% block title %}Panel del Emprendedor{% endblock %}
+{% block title %}Mi Espacio Emprendedor{% endblock %}
 
 {% block content %}
 <style>
-    /* 🎨 Estilo moderno del panel */
-    .card {
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
     }
 
-    .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .welcome-banner {
+        background: linear-gradient(135deg, #e0e0e0 0%, #764ba2 100%);
+        padding: 2.5rem;
+        border-radius: 20px;
         color: white;
-        font-size: 1.6rem;
-        font-weight: bold;
-        letter-spacing: 1px;
+        margin-bottom: 2rem;
+        box-shadow: 0 15px 30px rgba(118, 75, 162, 0.2);
+    }
+
+    .welcome-banner h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .welcome-banner p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .section-title i {
+        font-size: 1.8rem;
+        color: #667eea;
     }
 
     .form-control {
-        border-radius: 10px;
-        border: 2px solid #e0e0e0;
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
         transition: all 0.3s ease;
+        margin-bottom: 1rem;
     }
 
     .form-control:focus {
         border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
 
     .btn {
-        border-radius: 10px;
-        padding: 12px 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
         font-weight: 600;
-        letter-spacing: 0.5px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
     }
 
-    .btn-success {
-        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
         border: none;
-    }
-
-    .btn-success:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(67, 206, 162, 0.4);
     }
 
     .btn-danger {
-        background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+        background: linear-gradient(135deg, #f6365b 0%, #ff5858 100%);
+        color: white;
         border: none;
     }
 
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(255, 65, 108, 0.4);
+    .project-card {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
     }
 
-    .form-label {
+    .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .project-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .project-desc {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 16px;
+        color: white;
+        text-align: center;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .file-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+    }
+
+    .file-icon {
+        margin-right: 1rem;
+        color: #667eea;
+    }
+
+    .file-info {
+        flex-grow: 1;
+    }
+
+    .file-name {
+        color: #2d3748;
         font-weight: 500;
-        color: #333;
+        margin-bottom: 0.2rem;
     }
 
-    .container {
-        margin-top: 60px;
-        margin-bottom: 60px;
+    .file-meta {
+        font-size: 0.85rem;
+        color: #64748b;
     }
 
-    textarea {
-        resize: none;
+    .message-list {
+        max-height: 300px;
+        overflow-y: auto;
     }
 
-    .profile-image {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid #764ba2;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        margin-bottom: 15px;
+    .message-item {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    .welcome-message {
-        color: #555;
-        font-size: 1.1rem;
+    .message-text {
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .message-date {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* Estilos adicionales */
+    .learning-paths {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .path-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 16px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .path-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .path-card i {
+        font-size: 2rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+
+    .progress-bar {
+        background: #e2e8f0;
+        height: 10px;
+        border-radius: 5px;
+        margin: 1rem 0;
+    }
+
+    .progress {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.3s ease;
+    }
+
+    .chatbot-container {
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .chat-input .form-control {
+        margin-bottom: 0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .activity-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .activity-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .activity-date {
+        color: #64748b;
+        font-size: 0.9rem;
     }
 </style>
 
-<div class="container">
-    <div class="card">
-        <div class="card-header text-center">
-            💼 Panel del Emprendedor
-        </div>
+<div class="dashboard-container">
+    <div class="welcome-banner">
+        <h1>¡Hola {{ user.username }}! 🌟</h1>
+        <p>Bienvenido a tu espacio para crear, aprender y emprender</p>
+    </div>
 
-        <div class="card-body">
-            <div class="text-center">
-                <!-- Imagen de perfil -->
-                <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Foto de perfil" class="profile-image">
-                <h4 class="mt-2"><strong>{{ user.username }}</strong></h4>
-                <p class="welcome-message">Emprendedor en <strong>STARTPn Jr</strong></p>
+    <div class="dashboard-grid">
+        <div class="main-content">
+            <!-- Módulo de Mi Emprendimiento -->
+            <div class="panel">
+                <h2 class="section-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Mi Emprendimiento
+                </h2>
+                <form action="{{ url_for('crear_proyecto_emprendedor') }}" method="post">
+                    <input type="text" name="title" class="form-control" placeholder="¿Cómo se llama tu idea genial?" required>
+                    <textarea name="description" class="form-control" rows="3" 
+                            placeholder="Cuéntanos sobre tu idea... ¿Qué problema resuelve? ¿A quién ayuda?"></textarea>
+                    <select name="category" class="form-control" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="tecnologia">Tecnología</option>
+                        <option value="medio_ambiente">Medio Ambiente</option>
+                        <option value="social">Ayuda Social</option>
+                        <option value="educacion">Educación</option>
+                        <option value="otros">Otros</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">¡Registrar mi idea!</button>
+                </form>
+
+                <!-- Listado de proyectos -->
+                <div style="margin-top: 2rem;">
+                    {% if data.projects %}
+                        {% for p in data.projects %}
+                            <div class="project-card">
+                                <div class="project-title">{{ p.title }}</div>
+                                <div class="project-desc">{{ p.description }}</div>
+                                <div class="project-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: {{ p.progress }}%"></div>
+                                    </div>
+                                    <span>Avance: {{ p.progress }}%</span>
+                                </div>
+                                <div class="project-actions">
+                                    <button class="btn btn-secondary" onclick="actualizarProgreso({{ p.id }})">
+                                        <i class="fas fa-edit"></i> Actualizar
+                                    </button>
+                                    <form action="{{ url_for('eliminar_proyecto', proj_id=p.id) }}" method="post" style="display: inline;">
+                                        <button class="btn btn-danger" type="submit">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="project-card empty-state">
+                            <img src="{{ url_for('static', filename='img/idea.png') }}" alt="¡Crea tu idea!" style="width: 120px;">
+                            <p>¡Aún no has registrado ninguna idea! Comienza creando tu primer proyecto.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <hr>
-
-            <!-- Formulario de edición -->
-            <form method="POST" class="mt-4">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nombre de usuario</label>
-                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+            <!-- Módulo de Recursos de Aprendizaje -->
+            <div class="panel">
+                <h2 class="section-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    Mis Recursos de Aprendizaje
+                </h2>
+                <div class="learning-paths">
+                    <div class="path-card">
+                        <i class="fas fa-rocket"></i>
+                        <h3>Programa de Incubación</h3>
+                        <p>Aprende paso a paso cómo desarrollar tu idea</p>
+                        <a href="#" class="btn btn-primary">Comenzar</a>
+                    </div>
+                    <div class="path-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Prototipado</h3>
+                        <p>Crea la primera versión de tu producto</p>
+                        <a href="#" class="btn btn-primary">Explorar</a>
+                    </div>
+                    <div class="path-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Mentoría</h3>
+                        <p>Conecta con expertos que te guiarán</p>
+                        <a href="#" class="btn btn-primary">Agendar</a>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Correo electrónico</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email or '' }}">
+        <div class="sidebar">
+            <!-- Módulo de Progreso -->
+            <div class="panel">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Mi Progreso
+                </h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">{{ data.progress.level }}</div>
+                        <div class="metric-label">Nivel</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">{{ data.progress.points }}</div>
+                        <div class="metric-label">Puntos</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">{{ data.progress.badges }}</div>
+                        <div class="metric-label">Insignias</div>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción del emprendimiento</label>
-                    <textarea class="form-control" id="descripcion" name="descripcion" rows="4">{{ user.descripcion or '' }}</textarea>
+                
+                <!-- Próximas actividades -->
+                <div class="upcoming-activities">
+                    <h3>Próximas Actividades</h3>
+                    <ul class="activity-list">
+                        {% for activity in data.activities %}
+                        <li>
+                            <span class="activity-date">{{ activity.date }}</span>
+                            <span class="activity-title">{{ activity.title }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
+            </div>
 
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success me-2">💾 Guardar Cambios</button>
-                    <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Cerrar Sesión</a>
+            <!-- Módulo de Chat con Iarbis -->
+            <div class="panel">
+                <h2 class="section-title">
+                    <i class="fas fa-robot"></i>
+                    Pregúntale a Iarbis
+                </h2>
+                <div class="chatbot-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Los mensajes se cargarán dinámicamente -->
+                    </div>
+                    <form id="chatForm" class="chat-input">
+                        <input type="text" 
+                               placeholder="Escribe tu pregunta aquí..." 
+                               class="form-control"
+                               id="chatInput">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
                 </div>
-                <hr class="my-4">
-
-               <div class="text-center">
-             <h5 class="mb-3">📘 Accede a tu formación</h5>
-               <a href="{{ url_for('fase1') }}" class="btn btn-primary">🚀 Ir a Fase 1: Emprendimiento</a>
-         </div>
-
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Estilos adicionales */
+.learning-paths {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.path-card {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.path-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.path-card i {
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    background: #e2e8f0;
+    height: 10px;
+    border-radius: 5px;
+    margin: 1rem 0;
+}
+
+.progress {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.chatbot-container {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.chat-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input .form-control {
+    margin-bottom: 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+}
+
+.activity-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.activity-date {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+// Funcionalidad del chat con Iarbis
+document.getElementById('chatForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (message) {
+        // Aquí irá la lógica para enviar el mensaje al backend
+        addMessage('user', message);
+        input.value = '';
+        // Simular respuesta de Iarbis
+        setTimeout(() => {
+            addMessage('bot', '¡Hola! Estoy aquí para ayudarte con tu emprendimiento 😊');
+        }, 1000);
+    }
+});
+
+function addMessage(type, text) {
+    const messages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}-message`;
+    messageDiv.textContent = text;
+    messages.appendChild(messageDiv);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function actualizarProgreso(projectId) {
+    const progress = prompt('Ingresa el nuevo porcentaje de avance (0-100):');
+    if (progress !== null && !isNaN(progress) && progress >= 0 && progress <= 100) {
+        fetch(`/actualizar-progreso/${projectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ progress: parseInt(progress) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error al actualizar el progreso: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error al actualizar el progreso');
+            console.error('Error:', error);
+        });
+    }
+}
+
+// Format dates to local format
+document.addEventListener('DOMContentLoaded', function() {
+    const dates = document.querySelectorAll('.activity-date');
+    dates.forEach(date => {
+        const rawDate = date.textContent;
+        const formattedDate = new Date(rawDate).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        date.textContent = formattedDate;
+    });
+});
+</script>
 {% endblock %}
 

@@ -6,6 +6,7 @@
     <title>StartPn Jr</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='home_style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <!-- Fondo animado con círculos -->
@@ -20,27 +21,101 @@
         <div class="circle-bg circle-bg-8"></div>
     </div>
 
-    {% if session.get('user') %}
-<nav class="navbar">
-    <div class="nav-left">
-        <img src="{{ url_for('static', filename='/img/Fondo-login.png') }}" alt="Fondo login" class="Fondo-login">
-        <span class="nav-title">StartPn Jr</span>
-    </div>
+    <style>
+        .nav-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
 
-<div class="menu-opciones">
-    <button class="menu-btn">⋮</button>
-    <div class="menu-desplegable">
-        <a href="{{ url_for('home') }}">🏡 Inicio</a>
-        <a href="{{ url_for('panel_emprendedor') }}">🚀 Ir al Panel</a>
-        <a href="{{ url_for('logout') }}">🚪 Cerrar sesión</a>
-    </div>
-</div>
-</nav>
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            text-decoration: none;
+        }
 
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
 
+        .nav-link {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
 
-    {% endif %}
+        .nav-link:hover {
+            background: #f7fafc;
+            color: #4834d4;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        .btn-logout {
+            background: #4834d4;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background: #3c2bb7;
+            transform: translateY(-1px);
+        }
+
+        /* Ajuste para el contenido debajo del header fijo */
+        body {
+            padding-top: 80px;
+        }
+    </style>
+
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="brand">StartPn Jr</a>
+            
+            <nav class="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Inicio
+                </a>
+                <a href="{{ url_for('panel_emprendedor') }}" class="nav-link">
+                    <i class="fas fa-th-large"></i>
+                    Panel
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
         {% block content %}{% endblock %}
     </div>

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="prototipado-container">
+    <div class="welcome-banner">
+        <h1>Taller de Prototipado</h1>
+        <p>Convierte tus ideas en realidad paso a paso</p>
+    </div>
+
+    <div class="phases-grid">
+        {% for fase in contenido.fases %}
+        <div class="phase-card">
+            <h3>{{ fase.titulo }}</h3>
+            <p>{{ fase.descripcion }}</p>
+            <div class="recursos">
+                <h4>Recursos disponibles:</h4>
+                <ul>
+                    {% for recurso in fase.recursos %}
+                    <li>{{ recurso }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <button class="btn btn-primary">Comenzar esta fase</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.prototipado-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    color: white;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.phase-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recursos {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.recursos ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.recursos li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.btn {
+    margin-top: 1rem;
+    width: 100%;
+}
+</style>
+{% endblock %}
