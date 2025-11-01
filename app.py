@@ -620,10 +620,16 @@ def crear_proyecto_emprendedor():
 
 @app.route('/fase1_emprendedor')
 def fase1_emprendedor():
-    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
-        flash('No autorizado', 'error')
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para acceder a esta página.', 'error')
         return redirect(url_for('login'))
 
+    rol = session.get('rol')
+    if rol != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección.', 'error')
+        return redirect(url_for('home'))
+
+    # --- Obtener los datos del usuario emprendedor ---
     user_id = session['user_id']
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -632,7 +638,21 @@ def fase1_emprendedor():
     cursor.close()
     connection.close()
 
-    return render_template('fase1_emprendedor.html', user=user)
+    # --- Cargar los datos de proyectos del usuario (si los tiene) ---
+    data = load_user_data(user_id)
+    proyectos = data.get('projects', [])
+
+    # --- Renderizar la página específica de la fase 1 ---
+    return render_template(
+        'fase1_emprendedor.html',
+        user=user,
+        proyectos=proyectos
+    )
+
+@app.route('/fase2_emprendedor')
+def fase2_emprendedor():
+    return render_template('fase2_emprendedor.html')
+
 
 
 @app.route('/ver_proyectos_emprendedor')
@@ -651,41 +671,6 @@ def ver_proyectos_emprendedor():
 
     return render_template('ver_proyectos_emprendedor.html', proyectos=proyectos)
 
-@app.route('/crear_proyecto', methods=['GET', 'POST'])
-def crear_proyecto():
-    # Solo permite el acceso a emprendedores
-    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
-        flash('No autorizado', 'error')
-        return redirect(url_for('login'))
-
-    user_id = session['user_id']
-
-    if request.method == 'POST':
-        title = request.form.get('title')
-        description = request.form.get('description')
-        progress = int(request.form.get('progress', 0))
-
-        data = load_user_data(user_id)
-        projects = data.get('projects', [])
-
-        # Crear nuevo proyecto
-        new_project = {
-            'id': len(projects) + 1,
-            'title': title,
-            'description': description,
-            'progress': progress,
-            'created_at': datetime.now().strftime('%Y-%m-%d')
-        }
-
-        projects.append(new_project)
-        data['projects'] = projects
-        save_user_data(user_id, data)
-
-        flash('✅ Proyecto creado exitosamente.', 'success')
-        return redirect(url_for('ver_proyectos_emprendedor'))
-
-    # Si es GET, mostrar el formulario
-    return render_template('crear_proyecto.html')
 
 
 @app.route('/eliminar_proyecto/<int:proj_id>', methods=['POST'])
