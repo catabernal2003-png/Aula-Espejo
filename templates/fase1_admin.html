@@ -1,157 +1,121 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="page-wrapper py-5 position-relative">
-    <!-- BOTÓN FLOTANTE SUPERIOR -->
-    <a href="{{ url_for('home_admin') }}"
-       class="btn text-white fw-semibold px-4 py-2 position-absolute top-0 end-0 me-5 mt-4"
-       style="background-color: #6c63ff; border-radius: 10px; z-index: 10;">
-       Volver al panel principal
-    </a>
+<div class="page-wrapper py-5">
+    <div class="container mt-4">
 
-    <div class="container mt-5">
-
-        <!-- ENCABEZADO -->
-        <section class="text-center mb-5">
-            <h2 class="fw-bold text-dark mb-3 display-6">Proyectos de Emprendedores — Fase 1</h2>
-            <p class="text-muted fs-5 mb-0">
+        <!-- ENCABEZADO PRINCIPAL -->
+        <header class="text-center mb-5">
+            <h1 class="fw-bold text-dark mb-3 display-5">Proyectos de Emprendedores — Fase 1</h1>
+            <p class="text-muted fs-5 mb-0 max-w-600 mx-auto">
                 Monitoreo y análisis de los proyectos creados por los emprendedores durante esta fase del programa.
             </p>
-        </section>
+        </header>
 
-        <!-- BLOQUE DE ESTADÍSTICAS -->
-        <section class="row justify-content-center mb-5 g-4">
-            <div class="col-md-3">
-                <div class="card stat-card shadow-sm border-0 rounded-4 text-center py-4">
-                    <h6 class="text-muted mb-2">Total de Emprendedores</h6>
-                    <h3 class="fw-bold text-dark mb-0">{{ total_emprendedores if total_emprendedores is defined else "—" }}</h3>
+        <!-- CONTENEDOR PRINCIPAL: ESTADÍSTICAS A LA IZQUIERDA, TABLA A LA DERECHA -->
+        <div class="row g-4 mb-5">
+            
+            <!-- ESTADÍSTICAS -->
+            <div class="col-lg-3 col-md-4">
+                <div class="d-flex flex-column gap-3">
+                    <!-- Total de Emprendedores -->
+                    <div class="card stat-card" style="border-left: 4px solid #6c63ff;">
+                        <h6 class="text-muted mb-2">Total de Emprendedores</h6>
+                        <h3 class="fw-bold mb-0" style="color: #6c63ff;">
+                            {{ total_emprendedores if total_emprendedores is defined else "0" }}
+                        </h3>
+                    </div>
+                    <!-- Total de Proyectos -->
+                    <div class="card stat-card" style="border-left: 4px solid #ff6584;">
+                        <h6 class="text-muted mb-2">Total de Proyectos</h6>
+                        <h3 class="fw-bold mb-0" style="color: #ff6584;">
+                            {{ total_proyectos if total_proyectos is defined else "0" }}
+                        </h3>
+                    </div>
+                    <!-- Promedio de Progreso -->
+                    <div class="card stat-card" style="border-left: 4px solid #63ff9e;">
+                        <h6 class="text-muted mb-2">Promedio de Progreso</h6>
+                        <h3 class="fw-bold mb-0" style="color: #63ff9e;">
+                            {{ (promedio_progreso|string + "%") if promedio_progreso is defined else "0%" }}
+                        </h3>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stat-card shadow-sm border-0 rounded-4 text-center py-4">
-                    <h6 class="text-muted mb-2">Total de Proyectos</h6>
-                    <h3 class="fw-bold text-dark mb-0">{{ total_proyectos if total_proyectos is defined else "—" }}</h3>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stat-card shadow-sm border-0 rounded-4 text-center py-4">
-                    <h6 class="text-muted mb-2">Promedio de Progreso</h6>
-                    <h3 class="fw-bold text-dark mb-0">
-                        {{ promedio_progreso|string + "%" if promedio_progreso is defined else "—" }}
-                    </h3>
-                </div>
-            </div>
-        </section>
 
-        <!-- DIVISOR -->
-        <div class="divider mx-auto mb-5"></div>
-
-        <!-- CONTENIDO PRINCIPAL -->
-        {% if proyectos %}
-        <section class="card shadow-lg border-0 rounded-4 p-4 mb-5">
+<!--TABLA DE PROYECTOS -->
+<div class="container mb-5">
+    <section class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 fw-semibold">
+                <i class="fas fa-list-check me-2"></i>Listado de Proyectos
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if proyectos %}
             <div class="table-responsive">
-                <table class="table align-middle table-hover mb-0">
-                    <thead style="background-color: #6c63ff; color: white;">
-                        <tr class="text-center">
+                <table class="table table-hover table-striped align-middle mb-0 proyecto-table">
+                    <thead class="table-dark">
+                        <tr>
+                            {% if proyectos[0].user %}
                             <th>Emprendedor</th>
-                            <th>Título del Proyecto</th>
+                            {% endif %}
+                            <th>Título</th>
                             <th>Descripción</th>
-                            <th>Progreso</th>
-                            <th>Fecha de Creación</th>
+                            <th class="text-center">Progreso</th>
+                            <th class="text-center">Fecha de Creación</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for p in proyectos %}
                         <tr>
-                            <td class="fw-semibold text-center">{{ p.user }}</td>
-                            <td>{{ p.title }}</td>
-                            <td style="max-width: 400px;">{{ p.description }}</td>
-                            <td class="text-center" style="width: 200px;">
-                                <div class="progress" style="height: 18px; background-color: #eee;">
-                                    <div class="progress-bar 
-                                        {% if p.progress >= 70 %}bg-success
-                                        {% elif p.progress >= 40 %}bg-warning
-                                        {% else %}bg-danger{% endif %}"
-                                        role="progressbar"
-                                        style="width: {{ p.progress }}%;"
-                                        aria-valuenow="{{ p.progress }}"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100">
-                                        {{ p.progress }}%
+                            {% if p.user %}
+                            <td class="fw-semibold">{{ p.user }}</td>
+                            {% endif %}
+                            <td class="fw-medium">{{ p.title }}</td>
+                            <td style="max-width: 300px;">
+                                <p class="text-truncate-3 mb-0" title="{{ p.description }}">
+                                    {{ p.description }}
+                                </p>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height:14px;">
+                                        <div class="progress-bar
+                                            {% if p.progreso >= 70 %}bg-success
+                                            {% elif p.progreso >= 40 %}bg-warning
+                                            {% else %}bg-danger{% endif %}"
+                                            style="width: {{ p.progreso }}%;"
+                                            aria-valuenow="{{ p.progreso }}"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100">
+                                        </div>
                                     </div>
+                                    <span class="fw-bold small">{{ p.progreso }}%</span>
                                 </div>
                             </td>
-                            <td class="text-center">{{ p.created_at[:10] if p.created_at }}</td>
+                            <td class="text-center">{{ p.created_at.strftime('%d/%m/%Y') if p.created_at }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        {% else %}
-        <!-- CUANDO NO HAY PROYECTOS -->
-        <section class="d-flex justify-content-center">
-            <div class="card shadow-lg border-0 rounded-4 text-center p-5" style="max-width: 700px;">
-                <h4 class="fw-bold text-dark mb-3">No hay proyectos registrados aún</h4>
-                <p class="text-muted fs-6 mb-0">
-                    A medida que los emprendedores comiencen a registrar sus proyectos, estos aparecerán automáticamente en este panel para su evaluación.
-                </p>
+            {% else %}
+            <div class="text-center p-5">
+                <h5>No hay proyectos registrados.</h5>
             </div>
-        </section>
-        {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-center">
+        <a href="{{ url_for('home_admin') }}" class="btn btn-primary px-4 py-2 fw-semibold">
+            <i class="fas fa-arrow-left me-2"></i>Volver al panel principal
+        </a>
     </div>
 </div>
 
-<style>
-    body {
-        background: linear-gradient(135deg, #f9f8ff 0%, #e9e6ff 100%);
-    }
-
-    .divider {
-        width: 140px;
-        height: 4px;
-        background-color: #6c63ff;
-        border-radius: 2px;
-    }
-
-    .stat-card {
-        transition: 0.3s ease;
-        border-top: 4px solid #6c63ff;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 20px rgba(108, 99, 255, 0.15);
-    }
-
-    .table thead th {
-        font-weight: 600;
-        font-size: 1rem;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
-    }
-
-    .table tbody td {
-        font-size: 0.95rem;
-        vertical-align: middle;
-    }
-
-    .progress-bar {
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .btn:hover {
-        background-color: #5b55e3 !important;
-        transform: scale(1.03);
-        transition: 0.2s ease;
-    }
-</style>
 {% endblock %}
-
-
-
-
-
-
-

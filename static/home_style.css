@@ -1,492 +1,335 @@
+/* ============================================
+   ESTILOS PARA PANEL DE ADMINISTRACIÓN
+   ============================================ */
+
+/* Variables admin */
 :root {
-    --background: #f0f4ff;
-    --color: #2c3e50;
-    --primary-color: #3498db;
-    --secondary-color: #2ecc71;
-    --accent-color: #e74c3c;
-    --purple: #9b59b6;
-    --orange: #f39c12;
-    --navbar-bg: #ffffff;
+    --admin-primary: #6366f1;
+    --admin-secondary: #3b82f6;
+    --admin-accent: #8b5cf6;
+    --admin-success: #10b981;
+    --admin-warning: #f59e0b;
+    --admin-danger: #ef4444;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: "Poppins", sans-serif;
-    background: var(--background);
-    color: var(--color);
-    min-height: 100vh;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* Fondo animado con círculos */
-.background-animation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-.admin-link {
-    background: linear-gradient(135deg, #4caf50, #45a049);
-    color: white !important;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-weight: 600;
-    margin-left: 10px;
-    transition: all 0.3s ease;
-}
-
-.admin-link:hover {
-    background: #3c8c3d;
-    transform: translateY(-2px);
-}
-
-
-.circle-bg {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.15;
-    animation: float 20s infinite ease-in-out;
-}
-
-.circle-bg-1 {
-    width: 100px;
-    height: 100px;
-    background: var(--primary-color);
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 25s;
-}
-
-.circle-bg-2 {
-    width: 150px;
-    height: 150px;
-    background: var(--secondary-color);
-    top: 60%;
-    left: 80%;
-    animation-delay: 2s;
-    animation-duration: 20s;
-}
-
-.circle-bg-3 {
-    width: 80px;
-    height: 80px;
-    background: var(--accent-color);
-    top: 80%;
-    left: 20%;
-    animation-delay: 4s;
-    animation-duration: 22s;
-}
-
-.circle-bg-4 {
-    width: 120px;
-    height: 120px;
-    background: var(--purple);
-    top: 20%;
-    left: 70%;
-    animation-delay: 1s;
-    animation-duration: 28s;
-}
-
-.circle-bg-5 {
-    width: 90px;
-    height: 90px;
-    background: var(--orange);
-    top: 50%;
-    left: 50%;
-    animation-delay: 3s;
-    animation-duration: 24s;
-}
-
-.circle-bg-6 {
-    width: 110px;
-    height: 110px;
-    background: var(--primary-color);
-    top: 30%;
-    left: 30%;
-    animation-delay: 5s;
-    animation-duration: 26s;
-}
-
-.circle-bg-7 {
-    width: 70px;
-    height: 70px;
-    background: var(--secondary-color);
-    top: 70%;
-    left: 60%;
-    animation-delay: 2.5s;
-    animation-duration: 21s;
-}
-
-.circle-bg-8 {
-    width: 130px;
-    height: 130px;
-    background: var(--accent-color);
-    top: 40%;
-    left: 85%;
-    animation-delay: 4.5s;
-    animation-duration: 23s;
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    25% {
-        transform: translate(30px, -30px) scale(1.1);
-    }
-    50% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-    75% {
-        transform: translate(20px, 30px) scale(1.05);
-    }
-}
-
-/* Navbar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.1px 1px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 0 0 20px 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Contenedor del logo y título --- */
-.nav-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.fondo-login {
-    width: 50px;       /* Ajusta el tamaño según sea necesario */
-    height: auto;      /* Mantiene la proporción de la imagen */
-    object-fit: contain; /* Asegura que la imagen se ajuste dentro del contenedor */
-    margin-right: 8px; /* Espacio entre la imagen y el texto */
-}
-
-/* --- Texto del título junto al logo --- */
-.nav-brand h2 {
-    font-size: 1.1em;  /* 🔹 apenas más grande que la imagen */
-    margin: 0;
-    line-height: 1;
-    color: #ffffff;
-    font-weight: 600;
-}
-/* --- Texto “StartPn Jr” ajustado al tamaño del logo --- */
-.nav-title {
-    font-size: 2em;    /* 🔹 casi del mismo tamaño que el logo */
-    font-weight: 600;
-    background-color: #c8ff00;
-    color: #0c0c0c;
-    letter-spacing: 0.3px;
-    line-height: 1;
-}
-
-/* --- Enlaces del menú --- */
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.nav-link {
-    text-decoration: none;
-    background-color: #c8ff00;
-    color: #0f0f0f;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.2em;
-    font-weight: 500;
-    border-radius: 20px;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-/* --- Efecto al pasar el mouse --- */
-.nav-link::after {
-    content: "";
-    position: absolute;
-    width: 0%;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: #00c3ff;
-    transition: width 0.3s;
-}
-
-.nav-link:hover {
-    color: #00c3ff;
-}
-
-.nav-link:hover::after {
-    width: 100%;
-}
-
-/* --- Enlace de cerrar sesión destacado --- */
-.logout {
-    background-color: #c8ff00;
-    color: #1b1b1b;
-    padding: 6px 14px;
-    border-radius: 20px;
-    transition: 0.3s;
-}
-
-.logout:hover {
-    background-color: #0090c7;
-}
-/* Container */
-.container {
-    max-width: 1200px;
+/* Dashboard principal */
+.admin-dashboard {
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 3rem 2rem;
-    position: relative;
-    z-index: 10;
+    padding: 2rem 1.5rem;
 }
 
-/* Home Content */
-h1 {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
-    animation: fadeInDown 0.8s ease;
-}
-
-p {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    margin-bottom: 1rem;
-    color: var(--color);
-    animation: fadeInUp 0.8s ease;
-}
-
-strong {
-    color: var(--secondary-color);
-    font-weight: 700;
-}
-
-/* Cards para las fases */
-.phase-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.phase-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: none;
+/* Header del Admin */
+.admin-header {
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
     border-radius: 20px;
     padding: 2.5rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    border-left: 5px solid var(--primary-color);
-    position: relative;
-    overflow: hidden;
-}
-
-.phase-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(52, 152, 219, 0.1), transparent);
-    transform: rotate(45deg);
-    transition: all 0.5s ease;
-}
-
-.phase-card:hover::before {
-    top: -100%;
-    right: -100%;
-}
-
-.phase-card:nth-child(2) {
-    border-left-color: var(--secondary-color);
-}
-
-.phase-card:nth-child(2)::before {
-    background: linear-gradient(45deg, transparent, rgba(46, 204, 113, 0.1), transparent);
-}
-
-.phase-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-.phase-card h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color);
-    position: relative;
-    z-index: 1;
-}
-
-.phase-card:nth-child(2) h2 {
-    color: var(--secondary-color);
-}
-
-.phase-card p {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-    color: #555;
-    position: relative;
-    z-index: 1;
-}
-
-.phase-card a {
-    display: inline-block;
-    padding: 0.8rem 2rem;
-    background: var(--primary-color);
     color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
 }
 
-.phase-card:nth-child(2) a {
-    background: var(--secondary-color);
+.admin-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: white;
 }
 
-.phase-card a:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+.admin-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
 }
 
-.phase-card:nth-child(2) a:hover {
-    box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+/* Layout Principal: Sidebar + Content */
+.admin-main-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
 }
 
-/* ==== Estilos compartidos para iconos/tarjetas (admin y emprendedor) ==== */
-.icon-grid {
+/* ========== SIDEBAR IZQUIERDO ========== */
+.admin-sidebar {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.2rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.sidebar-item {
     display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 2rem 0;
-}
-
-.icon-card {
-    background: #ffffff;
-    width: 210px;
-    padding: 18px;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
     border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 6px 18px rgba(12, 20, 40, 0.06);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    border: 1px solid rgba(15, 23, 42, 0.03);
-    display: inline-block;
-    vertical-align: top;
+    margin-bottom: 0.8rem;
+    text-decoration: none;
+    color: #1f2937;
+    transition: all 0.3s ease;
+    background: rgba(99, 102, 241, 0.02);
+    border: 1px solid transparent;
 }
 
-.icon-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 18px 40px rgba(12, 20, 40, 0.12);
+.sidebar-item:hover {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: var(--admin-primary);
+    transform: translateX(5px);
 }
 
-.icon-card .icon {
-    width: 68px;
-    height: 68px;
-    margin: 0 auto 12px;
+.sidebar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: #fff;
-    font-size: 28px;
+    color: white;
+    font-size: 1.1rem;
     flex-shrink: 0;
 }
 
-.icon-card h3 {
-    font-size: 1.05rem;
-    margin: 0 0 6px;
-    color: var(--color);
+.sidebar-content {
+    flex: 1;
+}
+
+.sidebar-content h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.3rem 0;
+}
+
+.sidebar-content p {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ========== CONTENIDO PRINCIPAL (MÉTRICAS) ========== */
+.admin-content {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.content-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Grid de Métricas 2x2 */
+.metrics-grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(59, 130, 246, 0.05));
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+    border-color: var(--admin-primary);
+}
+
+.metric-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--admin-primary);
+    margin: 0 0 0.5rem 0;
+    line-height: 1;
+}
+
+.metric-label {
+    font-size: 0.95rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-icon-bg {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2.5rem;
+    color: rgba(99, 102, 241, 0.1);
+}
+
+/* Eliminar estilos antiguos que no se usan */
+.metric-icon {
+    display: none;
+}
+
+.action-card, .actions-grid, .action-header, 
+.action-icon, .action-arrow {
+    display: none;
+}
+
+/* Sección de Actividad Reciente */
+.recent-activity {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.section-title i {
+    color: var(--admin-primary);
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.8rem;
+    background: rgba(99, 102, 241, 0.03);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+    background: rgba(99, 102, 241, 0.06);
+    transform: translateX(5px);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-content strong {
+    color: #1f2937;
     font-weight: 600;
 }
 
-.icon-card p {
-    font-size: 0.9rem;
+.activity-time {
+    font-size: 0.85rem;
     color: #6b7280;
-    margin: 0;
+    margin-top: 0.3rem;
 }
 
-/* Asegurar que el enlace cubra toda la tarjeta */
-.icon-card a, .icon-card a:visited { color: inherit; text-decoration: none; display: block; }
-
-/* Animaciones */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    p {
-        font-size: 1rem;
-    }
-
-    .phase-cards {
+/* Responsive para Admin */
+@media (max-width: 1024px) {
+    .admin-main-layout {
         grid-template-columns: 1fr;
     }
+    
+    .admin-sidebar {
+        position: static;
+        margin-bottom: 2rem;
+    }
+}
 
-    .circle-bg {
-        opacity: 0.1;
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 1.8rem;
+    }
+    
+    .admin-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .metrics-grid-2x2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-item {
+        padding: 0.8rem;
+    }
+    
+    .sidebar-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 600px) {
-    .icon-card { width: 46%; padding: 12px; }
-    .icon-card .icon { width: 52px; height: 52px; font-size: 20px; }
+    .admin-dashboard {
+        padding: 1rem;
+    }
+    
+    .admin-content {
+        padding: 1.5rem;
+    }
+    
+    .metric-card {
+        padding: 1.5rem;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+    }
+    
+    .metric-icon-bg {
+        font-size: 2rem;
+    }
+    
+    .sidebar-content h4 {
+        font-size: 0.9rem;
+    }
+    
+    .sidebar-content p {
+        font-size: 0.75rem;
+    }
 }

@@ -1,110 +1,219 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Administrador</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background: linear-gradient(135deg, #f3f4f6, #e9ecf8);
-            
-        }
+{% extends "base.html" %}
+{% block title %}Panel de Administración{% endblock %}
 
-        header {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 50px;
-            border-radius: 0 0 20px 20px;
-        }
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='home_style.css') }}">
 
-        header img {
-            height: 60px;
-        }
-
-        nav a {
-            background: #ccff00;
-            color: #333;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 8px 18px;
-            border-radius: 20px;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-        }
-
-        nav a:hover {
-            background: #b3e600;
-        }
-
-        .contenido {
-            text-align: center;
-            margin-top: 70px;
-        }
-
-        h1 {
-            color: #2d9cdb;
-            font-size: 2.4rem;
-            font-weight: 800;
-        }
-
-        h2 {
-            color: #333;
-            margin-top: 10px;
-        }
-
-        a.enlace {
-            display: block;
-            color: #6a1b9a;
-            font-weight: 700;
-            margin-top: 20px;
-            text-decoration: none;
-            font-size: 1.2rem;
-        }
-
-        a.enlace:hover {
-            color: #4a148c;
-            text-decoration: underline;
-        }
-
-        p {
-            color: #333;
-            font-weight: 400;
-            margin-top: 4px;
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="logo">
-        <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="Logo">
-        <span style="font-size: 23px; font-weight: 700; color: black; background-color: #ccff00; padding: 5px 10px; border-radius: 8px;">StartPn Jr</span>
+<div class="admin-dashboard">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1>Panel de Administración</h1>
+        <p>Bienvenido, <strong>{{ session['username'] }}</strong> — Gestiona usuarios, proyectos y configuración del sistema</p>
     </div>
-    <nav>
-        <a href="{{ url_for('home') }}">Inicio</a>
-        <a href="{{ url_for('fase1') }}">Fase 1</a>
-        <a href="{{ url_for('fase2') }}">Fase 2</a>
-        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
-    </nav>
-</header>
 
-<section class="contenido">
-    <h1>Panel Principal del Administrador</h1>
-    <h2>Bienvenido, {{ session['username'] }}</h2>
+    <!-- Layout Principal: Sidebar + Métricas -->
+    <div class="admin-main-layout">
+        <!-- Sidebar Izquierdo - Acciones Rápidas -->
+        <aside class="admin-sidebar">
+            <h3 class="sidebar-title">Acciones Rápidas</h3>
+            
+            <!-- Gestión de Usuarios -->
+            <a href="{{ url_for('admin_usuarios') }}" class="sidebar-item">
+                <div class="sidebar-icon"><i class="fas fa-user-cog"></i></div>
+                <div class="sidebar-content">
+                    <h4>Gestión de Usuarios</h4>
+                    <p>Administra usuarios, roles y permisos del sistema</p>
+                </div>
+            </a>
 
-    <a href="{{ url_for('admin_usuarios') }}" class="enlace">Gestión de Usuarios</a>
-    <p>Administra los usuarios, roles y permisos del sistema.</p>
+            <!-- Entrenar Modelo -->
+            <a href="{{ url_for('admin_train_model') }}" class="sidebar-item">
+                <div class="sidebar-icon"><i class="fas fa-brain"></i></div>
+                <div class="sidebar-content">
+                    <h4>Entrenar Modelo ML</h4>
+                    <p>Entrena el modelo de predicción de éxito empresarial</p>
+                </div>
+            </a>
 
-    <a href="{{ url_for('home') }}" class="enlace">Ver Plataforma</a>
-    <p>Accede a la vista general del sistema.</p>
-</section>
+            <!-- Ver Plataforma -->
+            <a href="{{ url_for('home') }}" class="sidebar-item">
+                <div class="sidebar-icon"><i class="fas fa-home"></i></div>
+                <div class="sidebar-content">
+                    <h4>Ver Plataforma</h4>
+                    <p>Accede a la vista general del sistema</p>
+                </div>
+            </a>
 
-</body>
-</html>
+            <!-- Fase 1 -->
+            <a href="{{ url_for('fase1') }}" class="sidebar-item">
+                <div class="sidebar-icon"><i class="fas fa-lightbulb"></i></div>
+                <div class="sidebar-content">
+                    <h4>Proyectos — Fase 1</h4>
+                    <p>Monitoreo y análisis de los proyectos de los emprendedores</p>
+                </div>
+            </a>
 
+            <!-- Fase 2 -->
+            <a href="{{ url_for('fase2') }}" class="sidebar-item">
+                <div class="sidebar-icon"><i class="fas fa-cogs"></i></div>
+                <div class="sidebar-content">
+                    <h4>Proyectos — Fase 2</h4>
+                    <p>Preparación de datos y desarrollo de estrategias para los proyectos</p>
+                </div>
+            </a>
+        </aside>
+
+        <!-- Contenido Principal Derecho - Métricas -->
+        <div class="admin-content">
+            <h3 class="content-title">Estadísticas del Sistema</h3>
+            
+            <div class="metrics-grid-2x2">
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_usuarios|default(0) }}</div>
+                    <div class="metric-label">Usuarios Registrados</div>
+                    <div class="metric-icon-bg"><i class="fas fa-users"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_proyectos|default(0) }}</div>
+                    <div class="metric-label">Proyectos Activos</div>
+                    <div class="metric-icon-bg"><i class="fas fa-rocket"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">{{ promedio_progreso|default(0) }}%</div>
+                    <div class="metric-label">Progreso Promedio</div>
+                    <div class="metric-icon-bg"><i class="fas fa-chart-line"></i></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_mentores|default(0) }}</div>
+                    <div class="metric-label">Mentores Activos</div>
+                    <div class="metric-icon-bg"><i class="fas fa-user-tie"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Próximas Funcionalidades -->
+    <div class="recent-activity">
+        <h2 class="section-title">
+            <i class="fas fa-tools"></i>
+            Funcionalidades Avanzadas (Próximamente)
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; margin-top: 1.5rem;">
+            <div class="feature-coming">
+                <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+                <h4>Reportes y Analítica</h4>
+                <p>Dashboard con gráficos interactivos y exportación de datos</p>
+            </div>
+            
+            <div class="feature-coming">
+                <div class="feature-icon"><i class="fas fa-book"></i></div>
+                <h4>Gestión de Contenido</h4>
+                <p>Administrar recursos educativos, guías y materiales</p>
+            </div>
+            
+            <div class="feature-coming">
+                <div class="feature-icon"><i class="fas fa-cog"></i></div>
+                <h4>Configuración Avanzada</h4>
+                <p>Parámetros del sistema y personalización</p>
+            </div>
+            
+            <div class="feature-coming">
+                <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
+                <h4>Gestión de Mentores</h4>
+                <p>Asignar mentores y gestionar sesiones</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="recent-activity" style="margin-top: 2rem;">
+            <h2 class="section-title">
+            <i class="fas fa-history"></i> Actividad Reciente
+            </h2>
+
+            {% if actividades_recientes %}
+            {% for actividad in actividades_recientes %}
+                <div class="activity-item">
+                    <div class="activity-icon"><i class="fas fa-bell"></i></div>
+                    <div class="activity-content">
+                        <strong>{{ actividad.usuario }}</strong> {{ actividad.accion }}
+                        <div class="activity-time">{{ actividad.fecha }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                <p>No hay actividad reciente para mostrar</p>
+            </div>
+            {% endif %}
+    
+        <div style="text-align:right; margin-top: 1rem;">
+        <a href="{{ url_for('admin_actividad') }}" class="btn-view-all">
+            Ver todo <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+
+
+<style>
+/* Estilos adicionales para funcionalidades próximas */
+.feature-coming {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(59, 130, 246, 0.05));
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-coming:hover {
+    border-color: #6366f1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(59, 130, 246, 0.08));
+    transform: translateY(-3px);
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(59, 130, 246, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #6366f1;
+    margin: 0 auto 1rem;
+}
+
+.feature-coming h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.feature-coming p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.4;
+}
+.btn-view-all {
+    color: var(--admin-primary);
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-view-all:hover {
+    color: var(--admin-secondary);
+}
+
+</style>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}

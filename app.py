@@ -17,7 +17,7 @@ app.secret_key = 'tu_clave_secreta_aqui'
 db_config = {
     'host': '127.0.0.1',  # Cambiado de 'localhost' a '127.0.0.1'
     'user': 'root',
-    'password': '',  # Déjalo vacío si no tienes contraseña
+    'password': '',  
     'database': 'startpnjr',
     'port': 3306,
     'raise_on_warnings': True,
@@ -29,9 +29,9 @@ def get_db_connection():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password='',  # Si configuraste una contraseña en XAMPP, ponla aquí
+            password='',  
             database='startpnjr',
-            port=3306  # Puerto por defecto de MySQL
+            port=3306 
         )
         if connection.is_connected():
             print("Conexión exitosa a MySQL")
@@ -74,6 +74,28 @@ def init_db():
         finally:
             cursor.close()
             connection.close()
+
+# ------------------------------------------------------
+# Función para registrar actividad del administrador
+# ------------------------------------------------------
+def registrar_actividad(usuario_id, accion):
+    """Guarda una acción realizada por cualquier usuario."""
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("""
+            INSERT INTO actividad_sistema (usuario_id, accion, fecha)
+            VALUES (%s, %s, NOW())
+        """, (usuario_id, accion))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        print(f"Actividad registrada: {accion}")
+    except Exception as e:
+        print(f"Error al registrar actividad: {e}")
+
+
+
 
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
@@ -197,26 +219,6 @@ def home():
         mensaje=f"Bienvenido, {session['username']}"
     )
 
-@app.route('/modulos')
-def modulos():
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta sección', 'error')
-        return redirect(url_for('login'))
-    return render_template('modulos.html', 
-        username=session['username'],
-        user=session['username']  # Add this line
-    )
-
-@app.route('/recursos')
-def recursos():
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta página', 'error')
-        return redirect(url_for('login'))
-    
-    return render_template('fase2.html', 
-        username=session['username'],
-        user=session['username']  # Add this line
-    )
 
 @app.route('/logout')
 def logout():
@@ -226,39 +228,27 @@ def logout():
 
 @app.route('/admin/usuarios', methods=['GET', 'POST'])
 def admin_usuarios():
-    # Verificar sesión y rol
-    if 'user_id' not in session:
-        flash('Primero debes iniciar sesión', 'error')
-        return redirect(url_for('login'))
-
-    if session.get('rol') != 'Administrador':
-        flash('No tienes permiso para acceder a esta sección', 'error')
-        return redirect(url_for('home'))
-
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    search = None
+    search = request.form.get('search', '').strip() if request.method == 'POST' else None
+
     query = '''
         SELECT u.id, u.username, r.nombre AS rol
         FROM users u
         JOIN roles r ON u.rol_id = r.id
     '''
 
-    # Si se envía una búsqueda (POST)
-    if request.method == 'POST':
-        search = request.form.get('search', '').strip()
-        if search:
-            query += " WHERE u.username LIKE %s OR r.nombre LIKE %s"
-            cursor.execute(query, (f"%{search}%", f"%{search}%"))
-        else:
-            cursor.execute(query)
+    if search:
+        query += " WHERE u.username LIKE %s OR r.nombre LIKE %s"
+        cursor.execute(query, (f"%{search}%", f"%{search}%"))
+        registrar_actividad(session['user_id'], f"Buscó usuarios con '{search}'")
     else:
         cursor.execute(query)
+        registrar_actividad(session['user_id'], "Consultó la lista de usuarios")
 
     usuarios = cursor.fetchall()
 
-    # Contar usuarios por rol
     cursor.execute('''
         SELECT r.nombre AS rol, COUNT(u.id) AS total
         FROM roles r
@@ -267,20 +257,157 @@ def admin_usuarios():
     ''')
     resumen_roles = cursor.fetchall()
 
-
-    # Cargar roles para los select
     cursor.execute('SELECT * FROM roles')
     roles = cursor.fetchall()
 
     cursor.close()
     connection.close()
 
-    return render_template('admin_usuarios.html', 
-                            usuarios=usuarios,  
-                            roles=roles, 
-                            resumen_roles=resumen_roles,   
-                            search=search
-                            )
+    return render_template('admin_usuarios.html', usuarios=usuarios, roles=roles,
+                        resumen_roles=resumen_roles, search=search)
+
+
+@app.route('/admin/home')
+def home_admin():
+    try:
+        # Verificar sesión y rol
+        if 'user_id' not in session:
+            flash('Primero debes iniciar sesión', 'error')
+            return redirect(url_for('login'))
+
+        if session.get('rol') != 'Administrador':
+            flash('No tienes permiso para acceder a esta sección', 'error')
+            return redirect(url_for('home'))
+
+        # Conexión a la base de datos
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Métricas del sistema
+        cursor.execute("SELECT COUNT(*) AS total_usuarios FROM users")
+        total_usuarios = cursor.fetchone()['total_usuarios']
+
+        cursor.execute("SELECT COUNT(*) AS total_proyectos FROM proyectos")
+        total_proyectos = cursor.fetchone()['total_proyectos']
+
+        cursor.execute("SELECT AVG(progreso) AS promedio_progreso FROM proyectos")
+        promedio_progreso = cursor.fetchone()['promedio_progreso'] or 0
+        promedio_progreso = round(promedio_progreso, 2)
+
+        cursor.execute("""
+            SELECT COUNT(*) AS total_mentores 
+            FROM users u
+            JOIN roles r ON u.rol_id = r.id
+            WHERE r.nombre = 'Mentor'
+        """)
+        total_mentores = cursor.fetchone()['total_mentores']
+
+        # 🕓 Actividades recientes (últimas 5 acciones)
+        cursor.execute("""
+            SELECT u.username AS usuario, a.accion,
+                DATE_FORMAT(a.fecha, '%d/%m/%Y %H:%i') AS fecha
+            FROM actividad_admin a
+            JOIN users u ON a.usuario_id = u.id
+            ORDER BY a.fecha DESC
+            LIMIT 5
+        """)
+        actividades_recientes = cursor.fetchall()
+
+        # Cerrar conexión
+        cursor.close()
+        connection.close()
+
+        # Renderizar plantilla con datos
+        return render_template(
+            'home_admin.html',
+            total_usuarios=total_usuarios,
+            total_proyectos=total_proyectos,
+            promedio_progreso=promedio_progreso,
+            total_mentores=total_mentores,
+            actividades_recientes=actividades_recientes
+        )
+
+    except Exception as e:
+        print("Error en home_admin:", e)
+        flash("Ocurrió un error al cargar el panel del administrador.", "error")
+        return redirect(url_for('home'))
+
+@app.route('/admin/actividad')
+def admin_actividad():
+    try:
+        # Seguridad
+        if 'user_id' not in session:
+            flash('Primero debes iniciar sesión', 'error')
+            return redirect(url_for('login'))
+        if session.get('rol') != 'Administrador':
+            flash('No tienes permiso para acceder a esta sección', 'error')
+            return redirect(url_for('home'))
+
+        # Parámetros
+        search = request.args.get('search', '').strip()
+        page = max(1, int(request.args.get('page', 1)))
+        limit = 10
+        offset = (page - 1) * limit
+
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Consulta base (DATE_FORMAT necesita %% para que lleguen % a MySQL)
+        query = """
+            SELECT a.id, u.username AS usuario, r.nombre AS rol, a.accion,
+                DATE_FORMAT(a.fecha, '%d/%m/%Y %H:%i') AS fecha
+            FROM actividad_sistema a
+            JOIN users u ON a.usuario_id = u.id
+            JOIN roles r ON u.rol_id = r.id
+        """
+        params = []
+
+        # Filtro de búsqueda (seguro usando parámetros)
+        if search:
+            query += " WHERE u.username LIKE %s OR a.accion LIKE %s"
+            params.extend([f"%{search}%", f"%{search}%"])
+
+
+        query += f" ORDER BY a.fecha DESC LIMIT {limit} OFFSET {offset}"
+
+        print("SQL:", query)
+        print("PARAMS:", params)
+
+        cursor.execute(query, params)
+        actividades = cursor.fetchall()
+
+        # Contar total para paginación (maneja búsqueda también)
+        count_query = """
+            SELECT COUNT(*) AS total
+            FROM actividad_sistema a
+            JOIN users u ON a.usuario_id = u.id
+            JOIN roles r ON u.rol_id = r.id
+        """
+        count_params = []
+        if search:
+            count_query += " WHERE u.username LIKE %s OR a.accion LIKE %s"
+            count_params.extend([f"%{search}%", f"%{search}%"])
+
+        cursor.execute(count_query, count_params)
+        total_registros = cursor.fetchone()['total']
+        total_paginas = (total_registros + limit - 1) // limit if total_registros else 1
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            'admin_actividad.html',
+            actividades=actividades,
+            search=search,
+            page=page,
+            total_paginas=total_paginas
+        )
+
+    except Exception as e:
+        print("Error en admin_actividad:", e)
+        flash("Ocurrió un error al cargar el historial de actividad.", "error")
+        return redirect(url_for('home_admin'))
+
 
 
 @app.route('/admin/usuarios/actualizar_rol', methods=['POST'])
@@ -322,14 +449,7 @@ def eliminar_usuario():
         connection.close()
 
     return redirect(url_for('admin_usuarios'))
-@app.route('/home_admin')
-def home_admin():
-    if 'user_id' not in session or session.get('rol') != 'Administrador':
-        flash('Acceso no autorizado', 'error')
-        return redirect(url_for('login'))
-    return render_template('home_admin.html',
-        user=session['username']  # Add this line
-    )
+
 
 @app.route('/crear_usuario', methods=['POST'])
 def crear_usuario():
@@ -417,8 +537,8 @@ def panel_emprendedor():
     data = load_user_data(user['id'])
     
     # Initialize progress if not exists
-    if 'progress' not in data:
-        data['progress'] = {
+    if 'progreso' not in data:
+        data['progreso'] = {
             'level': 1,
             'points': 0,
             'badges': 0,
@@ -428,9 +548,9 @@ def panel_emprendedor():
 
     # Calculate progress percentage for each project
     if 'projects' in data:
-        for project in data['projects']:
-            if 'progress' not in project:
-                project['progress'] = 0
+        for project in data['proyectos']:
+            if 'progreso' not in project:
+                project['progreso'] = 0
     
     # Get current date for activities
     current_date = datetime.datetime.now()
@@ -465,8 +585,8 @@ def actualizar_progreso_proyecto(project_id):
         return jsonify({'error': 'No autorizado'}), 401
         
     try:
-        progress = int(request.json.get('progress', 0))
-        if progress < 0 or progress > 100:
+        progreso = int(request.json.get('progreso', 0))
+        if progreso < 0 or progreso > 100:
             return jsonify({'error': 'Progreso inválido'}), 400
             
         data = load_user_data(session['user_id'])
@@ -525,40 +645,45 @@ def fase1():
     rol = session.get('rol')
     user_id = session['user_id']
 
+    # --- Conexión a la base de datos ---
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+
+    # --- Obtener datos del usuario que está navegando ---
     cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
     user = cursor.fetchone()
-    cursor.close()
-    connection.close()
 
-    # Si es administrador, cargar todos los proyectos de los usuarios emprendedores
     if rol == 'Administrador':
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT id, username FROM users WHERE rol_id = 2")  # 2 = Emprendedor
+        # --- Obtener todos los emprendedores ---
+        cursor.execute("SELECT id, username FROM users WHERE rol_id = 4")  # 4 = Emprendedor
         emprendedores = cursor.fetchall()
-        cursor.close()
-        connection.close()
 
         proyectos = []
         for emp in emprendedores:
-            data = load_user_data(emp['id'])
-            for p in data.get('projects', []):
+            # --- Obtener los proyectos de cada emprendedor ---
+            cursor.execute(
+                "SELECT title, description, progreso, created_at FROM proyectos WHERE user_id = %s ORDER BY created_at DESC",
+                (emp['id'],)
+            )
+            emp_proyectos = cursor.fetchall()
+            for p in emp_proyectos:
                 proyectos.append({
                     'user': emp['username'],
                     'title': p.get('title', 'Sin título'),
                     'description': p.get('description', ''),
-                    'progress': p.get('progress', 0),
+                    'progreso': p.get('progreso', 0),
                     'created_at': p.get('created_at', '')
                 })
 
-        # --- 📊 Calcular estadísticas para el panel ---
+        # --- Estadísticas para el panel ---
         total_emprendedores = len(emprendedores)
         total_proyectos = len(proyectos)
         promedio_progreso = round(
-            sum(p['progress'] for p in proyectos) / total_proyectos, 1
+            sum(p['progreso'] for p in proyectos) / total_proyectos, 1
         ) if total_proyectos > 0 else 0
+
+        cursor.close()
+        connection.close()
 
         return render_template(
             'fase1_admin.html',
@@ -570,12 +695,27 @@ def fase1():
         )
 
     elif rol == 'Emprendedor':
-        return render_template('fase1_emprendedor.html', user=user)
+        # --- Obtener proyectos del emprendedor actual ---
+        cursor.execute(
+            "SELECT * FROM proyectos WHERE user_id = %s ORDER BY created_at DESC",
+            (user_id,)
+        )
+        proyectos = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        return render_template(
+            'fase1_emprendedor.html',
+            user=user,
+            proyectos=proyectos
+        )
 
     else:
+        cursor.close()
+        connection.close()
         flash('No tienes permiso para acceder a esta sección.', 'error')
         return redirect(url_for('home'))
-
 
 
 @app.route('/fase2')
@@ -595,28 +735,25 @@ def crear_proyecto_emprendedor():
     title = request.form.get('title', '').strip()
     desc = request.form.get('description', '').strip()
     category = request.form.get('category', '').strip()
-    
+
     if not title:
         flash('El título es obligatorio', 'error')
         return redirect(url_for('panel_emprendedor'))
 
     user_id = session['user_id']
-    data = load_user_data(user_id)
-    
-    project = {
-        "id": int(datetime.datetime.utcnow().timestamp()),
-        "title": title,
-        "description": desc,
-        "category": category,
-        "progress": 0,
-        "created_at": datetime.datetime.utcnow().isoformat()
-    }
-    
-    data.setdefault('projects', []).insert(0, project)
-    save_user_data(user_id, data)
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    query = """
+        INSERT INTO proyectos (user_id, title, description, category, progreso, created_at)
+        VALUES (%s, %s, %s, %s, %s, NOW())
+    """
+    cursor.execute(query, (user_id, title, desc, category, 0))
+    db.commit()
+
     flash('¡Proyecto creado exitosamente!', 'success')
-    
     return redirect(url_for('panel_emprendedor'))
+
 
 @app.route('/fase1_emprendedor')
 def fase1_emprendedor():
@@ -764,6 +901,57 @@ def enviar_mensaje_mentor():
     
     return jsonify({'success': True, 'message': 'Mensaje enviado'})
 
+# ============================================
+# FUNCIONALIDADES PRÓXIMAS A IMPLEMENTAR
+# ============================================
+
+# Reportes y Analítica
+@app.route('/admin/reportes')
+def admin_reportes():
+    """Dashboard con gráficos y estadísticas"""
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+    
+    flash('Módulo de reportes en desarrollo', 'info')
+    return redirect(url_for('home_admin'))
+
+
+# Gestión de Contenido
+@app.route('/admin/contenido')
+def admin_contenido():
+    """CRUD de recursos educativos"""
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+    
+    flash('Gestión de contenido en desarrollo', 'info')
+    return redirect(url_for('home_admin'))
+
+
+# Configuración del Sistema
+@app.route('/admin/configuracion')
+def admin_configuracion():
+    """Configuración y parámetros del sistema"""
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+    
+    flash('Configuración avanzada en desarrollo', 'info')
+    return redirect(url_for('home_admin'))
+
+
+# Gestión de Mentores
+@app.route('/admin/mentores')
+def admin_mentores():
+    """Gestionar mentores y asignaciones"""
+    if 'user_id' not in session or session.get('rol') != 'Administrador':
+        flash('Acceso no autorizado', 'error')
+        return redirect(url_for('login'))
+    
+    flash('Gestión de mentores en desarrollo', 'info')
+    return redirect(url_for('home_admin'))
+
 # Crear base de datos y tablas si no existen
 @app.cli.command('initdb')
 def initdb_command():
@@ -859,7 +1047,7 @@ def route_predict_success(proj_id):
     try:
         res = predict_project({
             'description': project.get('description', ''),
-            'progress': project.get('progress', 0),
+            'progreso': project.get('progreso', 0),
             'created_at': project.get('created_at', '')
         })
         return jsonify({'success': True, 'result': res})

@@ -1,0 +1,284 @@
+:root {
+    --admin-primary: #6366f1;
+    --admin-secondary: #3b82f6;
+    --admin-accent: #8b5cf6;
+    --admin-success: #10b981;
+    --admin-warning: #f59e0b;
+    --admin-danger: #ef4444;
+    --bg-white: #ffffff;
+    --text-dark: #111827;
+    --text-light: #6b7280;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Tarjeta de bienvenida */
+.welcome-card {
+    background: var(--bg-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-soft);
+    padding: 1.8rem 1.5rem;  
+    text-align: center;
+    max-width: 700px;        
+    margin: 1.5rem auto;    
+    animation: fadeInDown 0.8s ease;
+}
+
+.welcome-icon {
+    font-size: 2.2rem;
+    color: var(--admin-primary);
+    margin-bottom: 0.6rem;
+    animation: bounce 2s infinite;
+}
+
+.welcome-message h1 {
+    font-size: 2.2rem;
+    color: var(--admin-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.welcome-text p {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0.5rem 0;
+}
+
+.welcome-text p {
+    color: var(--text-dark);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+.intro-card {
+    background: #f9fafb;
+    border-left: 6px solid var(--admin-secondary);
+    padding: 2rem 1.8rem;
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.15);
+}
+/* tarjeta del usuario */
+.user-card {
+    max-width: 400px;         
+    padding: 1rem 0.8rem;     
+    margin: 0.5rem auto 1.5rem auto; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 0.6rem;
+}
+
+/* Ícono más pequeño */
+.user-card .welcome-icon {
+    font-size: 1.5rem;         
+    margin-bottom: 0.3rem;
+}
+
+/* Título más pequeño */
+.user-card .welcome-message h1 {
+    font-size: 1.1rem;         
+    font-weight: 600;
+    color: var(--admin-primary);
+    margin-bottom: 0.2rem;
+}
+
+
+.user-card .welcome-message p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+
+/* Cards de fases */
+.phase-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.8rem;
+    margin-top: 2.5rem;
+}
+
+.phase-card {
+    background: var(--bg-white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-soft);
+    padding: 2rem;
+    width: 280px;
+    text-align: center;
+    transition: transform 0.4s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 1s ease;
+}
+
+.phase-icon {
+    font-size: 2.8rem;
+    color: var(--admin-accent);
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.phase-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.phase-card:hover .phase-icon {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.phase-card h2 {
+    color: var(--admin-primary);
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+}
+
+.phase-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.phase-card a {
+    display: inline-block;
+    background: var(--admin-primary);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.phase-card a:hover {
+    background: var(--admin-secondary);
+}
+
+/* Animaciones */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.search-form button {
+    background: var(--admin-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background: var(--admin-secondary);
+}
+
+.activity-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: var(--shadow-soft);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.activity-table th, .activity-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.pagination {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.pagination a {
+    background: var(--admin-primary);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    margin: 0 0.2rem;
+    font-size: 0.85rem;
+}
+
+.pagination a:hover {
+    background: var(--admin-secondary);
+}
+/* Etiquetas visuales para los roles */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    text-transform: capitalize;
+}
+
+.badge-admin {
+    background: var(--admin-primary);
+}
+
+.badge-mentor {
+    background: var(--admin-accent);
+}
+
+.badge-user {
+    background: var(--admin-success);
+}
+
+.badge-neutral {
+    background: #9ca3af;
+}
+
+/*  tabla */
+.activity-table table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: var(--shadow-soft);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.activity-table th,
+.activity-table td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.95rem;
+}
+
+.activity-table th {
+    background: #f3f4f6;
+    color: var(--admin-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.activity-table tbody tr:hover {
+    background: #f9fafb;
+    transition: 0.3s ease;
+}

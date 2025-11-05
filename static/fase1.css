@@ -1,0 +1,182 @@
+/* Contenedor general */
+.page-wrapper {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Botón flotante superior */
+.page-wrapper a.btn {
+    transition: all 0.3s ease;
+}
+.page-wrapper a.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Encabezado */
+.page-wrapper h2.display-6 {
+    color: #333;
+}
+.page-wrapper p {
+    color: #6c757d;
+}
+
+/* Tarjetas de estadísticas */
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.stat-card h6 {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+.stat-card h3 {
+    font-size: 1.8rem;
+    color: #343a40;
+}
+
+/* Divisor */
+.divider {
+    height: 2px;
+    background-color: #6c63ff;
+    width: 80%;
+}
+
+/* Tabla de proyectos */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+.table th {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+.table td {
+    vertical-align: middle !important;
+    font-size: 0.95rem;
+}
+
+/* Barra de progreso */
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 18px;
+}
+
+/* Mensaje cuando no hay proyectos */
+.card.shadow-lg.text-center p {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    .page-wrapper h2.display-6 {
+        font-size: 1.7rem;
+    }
+}
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    height: 120px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.progress {
+    height: 12px;
+}
+
+.divider {
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #6c63ff, #ff6584);
+    opacity: 0.7;
+    margin: 30px auto;
+}
+
+.btn-primary {
+    background-color: #6c63ff;
+    border-color: #6c63ff;
+}
+
+@media (max-width: 992px) {
+    /* En tablet y móvil, estadisticas arriba, tabla debajo */
+    .row.g-4 {
+        flex-direction: column;
+    }
+    .col-lg-3, .col-lg-9 {
+        width: 100%;
+    }
+}
+/* Tabla de proyectos más bonita */
+.proyecto-table {
+    font-size: 0.95rem; /* Texto un poco más grande */
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.proyecto-table thead th {
+    background-color: #343a40;
+    color: #fff;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.proyecto-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa; /* color fila alterna */
+}
+
+.proyecto-table tbody tr:hover {
+    background-color: #e2e6ea; /* efecto hover más claro */
+}
+
+.proyecto-table td, .proyecto-table th {
+    padding: 12px 15px;
+}
+
+.progress-bar {
+    transition: width 0.4s ease;
+    height: 100%;
+}
+
+.text-truncate-3 {
+    font-size: 0.95rem; /* ligeramente más grande */
+}

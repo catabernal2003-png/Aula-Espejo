@@ -6,7 +6,12 @@
     <title>StartPn Jr - {% block title %}{% endblock %}</title>
     
     <!-- CSS principal y fuentes -->
+     <!-- EN base.html AGREGAR: -->
+    <link href="{{ url_for('static', filename='fase1.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     

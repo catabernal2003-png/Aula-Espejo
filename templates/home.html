@@ -1,27 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="welcome-message">
-    <h1>{{ mensaje }}</h1>
-    {% if rol %}
-    <p>({{ rol }})</p>
-    {% endif %}
-</div>
-<div style="animation: fadeInUp 0.8s ease;">
-    <p>Aplicación web para integrar la metodología <strong>CRISP-ML</strong> con el proyecto StartPn Jr.</p>
-    <p>Selecciona una de las fases del menú superior o haz clic en las tarjetas a continuación para continuar.</p>
-    
-    <div class="phase-cards">
-        <div class="phase-card">
-            <h2>Fase 1</h2>
-            <p>Comprensión del negocio y exploración de datos</p>
-            <a href="{{ url_for('fase1') }}">Ir a Fase 1</a>
+<div class="container">
+    <div class="welcome-card user-card">
+        <div class="welcome-icon">
+            <i class="fas fa-user-cog"></i>
         </div>
-        
-        <div class="phase-card">
-            <h2>Fase 2</h2>
-            <p>Preparación de datos y modelado</p>
-            <a href="{{ url_for('fase2') }}">Ir a Fase 2</a>
+        <div class="welcome-message">
+            <h1>{{ mensaje }}</h1>
+            {% if rol %}
+                <p>({{ rol }})</p>
+            {% endif %}
         </div>
     </div>
+
+<div class="welcome-card project-card">
+        <div class="welcome-icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <div class="welcome-message">
+            <h1>Bienvenido a StartPn Jr</h1>
+            <p>Incubadora Infantil y Juvenil de Emprendimiento</p>
+        </div>
+
+        <div class="welcome-text">
+            <p>Impulsamos la <strong>culturalización del emprendimiento desde edades tempranas</strong>,
+            ayudando a niños y adolescentes a transformar sus ideas en proyectos reales con impacto social y económico.</p>
+
+            <p>A través de programas de <strong>incubación</strong>, <strong>prototipado</strong>,
+            <strong>mentoría</strong> y <strong>formación vacacional</strong>, potenciamos la creatividad,
+            innovación y liderazgo de las futuras generaciones de emprendedores.</p>
+    </div>
 </div>
+
+<div class="phase-cards">
+    <div class="phase-card">
+        <div class="phase-icon"><i class="fas fa-lightbulb"></i></div>
+        <h2>Fase 1</h2>
+        <p>Explora el mundo del emprendimiento y analiza los proyectos creados por jóvenes emprendedores.</p>
+        <a href="{{ url_for('fase1') }}">Ir a Fase 1</a>
+    </div>
+
+    <div class="phase-card">
+        <div class="phase-icon"><i class="fas fa-cogs"></i></div>
+        <h2>Fase 2</h2>
+        <p>Modela, valida y mejora los resultados con la guía de mentores y herramientas predictivas.</p>
+        <a href="{{ url_for('fase2') }}">Ir a Fase 2</a>
+    </div>
+</div>
+
 {% endblock %}

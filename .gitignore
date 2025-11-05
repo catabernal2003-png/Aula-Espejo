@@ -1,0 +1,23 @@
+# CARPETAS DE ENTORNO - ESTO ES LO QUE NECESITAS
+entornos/
+env/
+venv/
+.venv/
+
+# Archivos de entorno
+*.env
+.env
+.env.local
+
+# Logs y archivos temporales
+*.log
+logs/
+temp/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

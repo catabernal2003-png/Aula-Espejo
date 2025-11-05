@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="admin-content">
+    <h2 class="section-title">
+        <i class="fas fa-clipboard-list"></i> Historial de Actividad
+    </h2>
+
+    <!-- Barra de búsqueda -->
+    <form method="get" action="{{ url_for('admin_actividad') }}" class="search-form">
+        <input type="text" name="search" placeholder="Buscar por usuario o acción..." value="{{ search }}" />
+        <button type="submit"><i class="fas fa-search"></i> Buscar</button>
+    </form>
+
+    <!-- Tabla de actividades -->
+    <div class="activity-table">
+        {% if actividades %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Acción</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in actividades %}
+                        <tr>
+                            <td>{{ a.id }}</td>
+                            <td>{{ a.usuario }}</td>
+                            <td>
+                                {% if a.rol == 'Administrador' %}
+                                    <span class="badge badge-admin">Administrador</span>
+                                {% elif a.rol == 'Mentor' %}
+                                    <span class="badge badge-mentor">Mentor</span>
+                                {% elif a.rol == 'Emprendedor' %}
+                                    <span class="badge badge-user">Emprendedor</span>
+                                {% else %}
+                                    <span class="badge badge-neutral">{{ a.rol }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ a.accion }}</td>
+                            <td>{{ a.fecha }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <div class="pagination">
+                {% if page > 1 %}
+                    <a href="{{ url_for('admin_actividad', page=page-1, search=search) }}">← Anterior</a>
+                {% endif %}
+                <span>Página {{ page }} de {{ total_paginas }}</span>
+                {% if page < total_paginas %}
+                    <a href="{{ url_for('admin_actividad', page=page+1, search=search) }}">Siguiente →</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p style="text-align:center; color:#6b7280; margin-top:2rem;">
+                No hay registros de actividad.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

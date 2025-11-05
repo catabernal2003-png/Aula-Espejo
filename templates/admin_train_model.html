@@ -1,22 +1,61 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Entrenar Modelo de Éxito</h2>
+<div class="page-wrapper py-5">
+    <div class="container d-flex justify-content-center">
 
-    <p class="text-center text-muted">
-        Este proceso entrenará el modelo <b>Logistic Regression multinomial</b> usando el archivo
-        <code>data/success_training.csv</code>.
-    </p>
+        <!-- Card centrada -->
+        <div class="card shadow-lg p-5 text-center" style="max-width: 600px; border-radius: 1rem;">
+            
+            <!-- Título -->
+            <h2 class="fw-bold mb-3">Entrenar Modelo de Éxito</h2>
+            
+            <!-- Descripción -->
+            <p class="text-muted mb-4">
+                Este proceso entrenará el modelo <b>Logistic Regression multinomial</b> usando el archivo
+                <code>data/success_training.csv</code>.
+            </p>
+            
+            <!-- Botón -->
+            <button id="train-btn" class="btn btn-primary btn-lg px-4 py-2 fw-semibold">
+                🚀 Entrenar Modelo
+            </button>
 
-    <div class="text-center mt-4">
-        <button id="train-btn" class="btn btn-primary btn-lg">
-            🚀 Entrenar Modelo
-        </button>
+            <!-- Salida / Mensajes -->
+            <div id="output" class="mt-4"></div>
+
+        </div>
     </div>
-
-    <div id="output" class="mt-4 text-center"></div>
 </div>
 
+<style>
+    .page-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.card {
+    background: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+#train-btn {
+    font-size: 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#train-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+</style>
 <script>
 document.getElementById("train-btn").addEventListener("click", async () => {
     const output = document.getElementById("output");

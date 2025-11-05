@@ -1,0 +1,29 @@
+{
+  "projects": [],
+  "files": [],
+  "messages": [],
+  "progress": {
+    "level": 1,
+    "points": 0,
+    "badges": 0,
+    "total_activities": 0,
+    "completed_activities": 0
+  },
+  "activities": [
+    {
+      "date": "2025-11-11",
+      "title": "Taller: Introducción al Emprendimiento",
+      "type": "workshop"
+    },
+    {
+      "date": "2025-11-18",
+      "title": "Mentoría: Desarrollo de Ideas",
+      "type": "mentorship"
+    },
+    {
+      "date": "2025-11-25",
+      "title": "Taller: Prototipado Rápido",
+      "type": "workshop"
+    }
+  ]
+}
