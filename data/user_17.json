@@ -25,19 +25,26 @@
   },
   "activities": [
     {
-      "date": "2025-11-08",
+      "date": "2025-11-13",
       "title": "Taller: Introducción al Emprendimiento",
       "type": "workshop"
     },
     {
-      "date": "2025-11-15",
+      "date": "2025-11-20",
       "title": "Mentoría: Desarrollo de Ideas",
       "type": "mentorship"
     },
     {
-      "date": "2025-11-22",
+      "date": "2025-11-27",
       "title": "Taller: Prototipado Rápido",
       "type": "workshop"
     }
-  ]
+  ],
+  "progreso": {
+    "level": 1,
+    "points": 0,
+    "badges": 0,
+    "total_activities": 0,
+    "completed_activities": 0
+  }
 }
