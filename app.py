@@ -575,7 +575,7 @@ def panel_emprendedor():
 
     # Calculate progress percentage for each project
     if 'projects' in data:
-        for project in data['proyectos']:
+        for project in data.get('proyectos', []):
             if 'progreso' not in project:
                 project['progreso'] = 0
     
@@ -745,15 +745,6 @@ def fase1():
         return redirect(url_for('home'))
 
 
-@app.route('/fase2')
-def fase2():
-    # Igual que la anterior, solo para evitar errores de URL.
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión para acceder a esta página', 'error')
-        return redirect(url_for('login'))
-    return render_template('fase_placeholder.html', titulo="Fase 2")
-
-
 @app.route('/crear_proyecto_emprendedor', methods=['POST'])
 def crear_proyecto_emprendedor():
     if 'user_id' not in session:
@@ -815,9 +806,19 @@ def fase1_emprendedor():
 
 @app.route('/fase2_emprendedor')
 def fase2_emprendedor():
-    return render_template('fase2_emprendedor.html')
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
 
+    user_id = session['user_id']
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    connection.close()
 
+    return render_template('fase2_emprendedor.html', user=user)
 
 @app.route('/ver_proyectos_emprendedor')
 def ver_proyectos_emprendedor():

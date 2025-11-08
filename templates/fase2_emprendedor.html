@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fase2-container">
+  <div class="header-fase2">
+    <h1>Fase 2 — Modelado y Validación</h1>
+    <p>En esta fase podrás entrenar tu modelo y validar los resultados de tus proyectos.</p>
+  </div>
+
+  <div class="actions-header">
+    <a href="{{ url_for('panel_emprendedor') }}" class="btn-volver">← Volver al panel principal</a>
+  </div>
+
+  <div class="grid-cards">
+    <!-- Tarjeta 1 -->
+    <div class="card-fase2">
+      <div class="card-header">
+        <i class="fas fa-brain icon"></i>
+        <h4>Entrenamiento del Modelo</h4>
+      </div>
+      <p>Entrena el modelo de predicción con los datos actuales del sistema.</p>
+      <form method="post" action="{{ url_for('route_train_success_model') }}">
+        <button type="submit" class="btn-primary">Entrenar Modelo</button>
+      </form>
+    </div>
+
+    <!-- Tarjeta 2 -->
+    <div class="card-fase2">
+      <div class="card-header">
+        <i class="fas fa-chart-line icon"></i>
+        <h4>Validación de Resultados</h4>
+      </div>
+      <p>Selecciona un proyecto para analizar y ver su nivel de éxito según el modelo.</p>
+      <form method="get" action="{{ url_for('route_predict_success', proj_id=1) }}">
+        <button type="submit" class="btn-primary">Validar Proyecto</button>
+      </form>
+    </div>
+
+    <!-- Tarjeta 3 -->
+    <div class="card-fase2">
+      <div class="card-header">
+        <i class="fas fa-database icon"></i>
+        <h4>Datos del Proyecto</h4>
+      </div>
+      <p>Consulta la información recopilada de tus proyectos registrados en el sistema.</p>
+      <a href="{{ url_for('ver_proyectos_emprendedor') }}" class="btn-primary">Ver Proyectos</a>
+    </div>
+
+    <!-- Tarjeta 4 -->
+    <div class="card-fase2">
+      <div class="card-header">
+        <i class="fas fa-bolt icon"></i>
+        <h4>Rendimiento del Modelo</h4>
+      </div>
+      <p>Revisa métricas y precisión del modelo entrenado.</p>
+      <button class="btn-primary">Ver Rendimiento</button>
+    </div>
+  </div>
+
+  {% if result %}
+  <div class="result-card">
+    <h4>Resultado del modelo:</h4>
+    <pre>{{ result | tojson(indent=2) }}</pre>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #6c63ff 0%, #726bff 40%, #8b83ff 100%);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .fase2-container {
+    padding: 40px 80px;
+  }
+
+  .header-fase2 {
+    color: white;
+    margin-bottom: 30px;
+  }
+
+  .header-fase2 h1 {
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .header-fase2 p {
+    font-size: 15px;
+    color: #e8e8ff;
+  }
+
+  .actions-header {
+    margin-bottom: 40px;
+  }
+
+  .btn-volver {
+    background-color: white;
+    color: #6c63ff;
+    padding: 10px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s;
+  }
+
+  .btn-volver:hover {
+    background-color: #f0f0ff;
+    color: #5848f8;
+  }
+
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  .card-fase2 {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .card-fase2:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .card-header h4 {
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+  }
+
+  .icon {
+    background: linear-gradient(145deg, #6c63ff, #8b83ff);
+    color: white;
+    border-radius: 50%;
+    padding: 12px;
+    margin-right: 12px;
+    font-size: 1.4rem;
+  }
+
+  .btn-primary {
+    background: #6c63ff;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+
+  .btn-primary:hover {
+    background: #554df1;
+    transform: scale(1.03);
+  }
+
+  .result-card {
+    background: white;
+    margin-top: 50px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .result-card pre {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    .fase2-container {
+      padding: 30px 20px;
+    }
+  }
+</style>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+
