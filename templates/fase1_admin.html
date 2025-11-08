@@ -77,20 +77,21 @@
                                     {{ p.description }}
                                 </p>
                             </td>
+                            {# Normalizar el valor de progreso: acepta p.progreso o p['progress'] o 0 #}
+                            {% set progreso = p.progreso if (p.progreso is defined) else (p['progress'] if ('progress' in p) else 0) %}
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="progress flex-grow-1 me-2" style="height:14px;">
                                         <div class="progress-bar
-                                            {% if p.progreso >= 70 %}bg-success
-                                            {% elif p.progreso >= 40 %}bg-warning
+                                            {% if progreso|int >= 70 %}bg-success
+                                            {% elif progreso|int >= 40 %}bg-warning
                                             {% else %}bg-danger{% endif %}"
-                                            style="width: {{ p.progreso }}%;"
-                                            aria-valuenow="{{ p.progreso }}"
-                                            aria-valuemin="0"
-                                            aria-valuemax="100">
+                                             role="progressbar"
+                                             style="width: {{ progreso|int }}%;"
+                                             aria-valuenow="{{ progreso|int }}" aria-valuemin="0" aria-valuemax="100">
                                         </div>
                                     </div>
-                                    <span class="fw-bold small">{{ p.progreso }}%</span>
+                                    <span class="fw-bold small">{{ progreso }}%</span>
                                 </div>
                             </td>
                             <td class="text-center">{{ p.created_at.strftime('%d/%m/%Y') if p.created_at }}</td>

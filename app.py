@@ -562,7 +562,12 @@ def panel_emprendedor():
     }
 
     data = load_user_data(user['id'])
-    
+    proyectos = normalize_proyectos(data.get('projects', []))
+
+    # Asignar IDs únicos si no los tienen
+    for i, p in enumerate(proyectos):
+        p['id'] = p.get('id', i + 1)
+
     # Initialize progress if not exists
     if 'progreso' not in data:
         data['progreso'] = {
@@ -604,7 +609,7 @@ def panel_emprendedor():
     data['activities'] = upcoming_activities
     save_user_data(user['id'], data)
 
-    return render_template('panel_emprendedor.html', user=user, data=data)
+    return render_template('panel_emprendedor.html', user=user, data=data, proyectos=proyectos)
 
 @app.route('/actualizar-progreso/<int:project_id>', methods=['POST'])
 def actualizar_progreso_proyecto(project_id):
@@ -615,16 +620,17 @@ def actualizar_progreso_proyecto(project_id):
         progreso = int(request.json.get('progreso', 0))
         if progreso < 0 or progreso > 100:
             return jsonify({'error': 'Progreso inválido'}), 400
-            
+
         data = load_user_data(session['user_id'])
-        
+
         # Update project progreso
         for project in data.get('projects', []):
             if project.get('id') == project_id:
-                project['progress'] = progress
+                project['progreso'] = progreso
+                project['progress'] = progreso
                 save_user_data(session['user_id'], data)
-                return jsonify({'success': True, 'progress': progress})
-                
+                return jsonify({'success': True, 'progress': progreso})
+
         return jsonify({'error': 'Proyecto no encontrado'}), 404
         
     except Exception as e:
@@ -687,7 +693,6 @@ def fase1():
 
         proyectos = []
         for emp in emprendedores:
-            # --- Obtener los proyectos de cada emprendedor ---
             cursor.execute(
                 "SELECT title, description, progreso, created_at FROM proyectos WHERE user_id = %s ORDER BY created_at DESC",
                 (emp['id'],)
@@ -698,9 +703,12 @@ def fase1():
                     'user': emp['username'],
                     'title': p.get('title', 'Sin título'),
                     'description': p.get('description', ''),
-                    'progreso': p.get('progreso', 0),
+                    'progreso': p.get('progreso', p.get('progress', 0)),
                     'created_at': p.get('created_at', '')
                 })
+
+        # Normalizar para plantillas (añade también 'progress')
+        proyectos = normalize_proyectos(proyectos)
 
         # --- Estadísticas para el panel ---
         total_emprendedores = len(emprendedores)
@@ -832,7 +840,7 @@ def ver_proyectos_emprendedor():
 
     # Asignar IDs únicos si no los tienen
     for i, p in enumerate(proyectos):
-        p['id'] = i + 1
+        p['id'] = p.get('id', i + 1)
 
     return render_template('ver_proyectos_emprendedor.html', proyectos=proyectos)
 
@@ -1788,9 +1796,48 @@ def admin_train_model():
         return redirect(url_for('login'))
     return render_template('admin_train_model.html', user=session['username'])
 
+def normalize_proyectos(raw_proyectos):
+    normalized = []
+    for p in raw_proyectos:
+        progreso = 0
+        title = None
+        description = None
+        created_at = None
+        user = None
+
+        if isinstance(p, dict):
+            # aceptar varias posibles claves y normalizar
+            progreso = p.get('progreso', p.get('progress', p.get('progreso_final', 0))) or 0
+            title = p.get('title') or p.get('titulo') or ''
+            description = p.get('description') or p.get('descripcion') or ''
+            created_at = p.get('created_at') or p.get('createdAt') or p.get('fecha') or ''
+            user = p.get('user') or p.get('username') or p.get('autor') or None
+        else:
+            progreso = getattr(p, 'progreso', None) or getattr(p, 'progress', 0) or 0
+            title = getattr(p, 'title', None) or getattr(p, 'titulo', '') or ''
+            description = getattr(p, 'description', None) or getattr(p, 'descripcion', '') or ''
+            created_at = getattr(p, 'created_at', None) or getattr(p, 'createdAt', '') or ''
+            user = getattr(p, 'user', None) or getattr(p, 'username', None)
+
+        # asegurar tipos
+        try:
+            progreso = int(float(progreso))
+        except Exception:
+            progreso = 0
+
+        proj = {
+            'user': user,
+            'title': title,
+            'description': description,
+            'progreso': progreso,
+            'progress': progreso,   # mantener ambas claves para compatibilidad con plantillas
+            'created_at': created_at
+        }
+        normalized.append(proj)
+    return normalized
+
+
 if __name__ == '__main__':
     init_db()  # Crea las tablas si no existen
     print("✅ Servidor Flask iniciado en http://127.0.0.1:5000")
     app.run(debug=True)
-
-

@@ -219,6 +219,16 @@ textarea { min-height:96px; resize:vertical; }
       <h1>Bienvenido, {{ user.username }}</h1>
       <p>Gestiona tus proyectos y aprovecha los recursos disponibles para hacer crecer tu emprendimiento.</p>
     </div>
+    
+    {# Normalizar acceso a progress para evitar UndefinedError #}
+    {% set progress = {} %}
+    {% if data is defined %}
+      {% if data.progress is defined %}
+        {% set progress = data.progress %}
+      {% elif 'progress' in data %}
+        {% set progress = data['progress'] %}
+      {% endif %}
+    {% endif %}
 
     <div class="user-profile">
       <div class="avatar">{{ user.username[0]|upper }}</div>
@@ -231,15 +241,15 @@ textarea { min-height:96px; resize:vertical; }
 
   <div class="quick-stats" style="margin-top:1.25rem; display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
     <div class="stat-card card" style="padding:1rem;">
-      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.level|default(1) }}</div>
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ progress.level|default(1) }}</div>
       <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Nivel Actual</div>
     </div>
     <div class="stat-card card" style="padding:1rem;">
-      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.points|default(0) }}</div>
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ progress.points|default(0) }}</div>
       <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Puntos</div>
     </div>
     <div class="stat-card card" style="padding:1rem;">
-      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ data.progress.badges|default(0) }}</div>
+      <div class="stat-value" style="font-size:1.6rem; font-weight:800; color:var(--primary);">{{ progress.badges|default(0) }}</div>
       <div class="stat-label" style="color:var(--muted); margin-top:0.5rem;">Insignias</div>
     </div>
   </div>
@@ -397,9 +407,9 @@ textarea { min-height:96px; resize:vertical; }
     <div class="card" style="margin-bottom:1rem;">
       <div class="section-title"><i class="fas fa-chart-line"></i> Mi Progreso</div>
       <div class="metrics" style="margin-top:0.6rem;">
-        <div class="metric"><div class="value">{{ data.progress.level|default(1) }}</div><div class="label">Nivel</div></div>
-        <div class="metric"><div class="value">{{ data.progress.points|default(0) }}</div><div class="label">Puntos</div></div>
-        <div class="metric"><div class="value">{{ data.progress.badges|default(0) }}</div><div class="label">Insignias</div></div>
+        <div class="metric"><div class="value">{{ progress.level|default(1) }}</div><div class="label">Nivel</div></div>
+        <div class="metric"><div class="value">{{ progress.points|default(0) }}</div><div class="label">Puntos</div></div>
+        <div class="metric"><div class="value">{{ progress.badges|default(0) }}</div><div class="label">Insignias</div></div>
       </div>
 
       <div style="margin-top:1rem;">
