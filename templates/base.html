@@ -6,12 +6,9 @@
     <title>StartPn Jr - {% block title %}{% endblock %}</title>
     
     <!-- CSS principal y fuentes -->
-     <!-- EN base.html AGREGAR: -->
     <link href="{{ url_for('static', filename='fase1.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
-
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -27,6 +24,8 @@
             --light: #f5f6fa;
             --dark: #2f3640;
             --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --mentor-primary: #8b5cf6;
+            --coord-primary: #059669;
         }
 
         body {
@@ -75,7 +74,7 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             align-items: center;
         }
 
@@ -83,12 +82,13 @@
             text-decoration: none;
             color: var(--dark);
             font-weight: 500;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
             border-radius: 8px;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.95rem;
         }
 
         .nav-link:hover {
@@ -101,6 +101,43 @@
             color: white;
         }
 
+        /* Estilos específicos por rol */
+        .nav-link.admin-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .nav-link.admin-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .nav-link.mentor-link:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--mentor-primary);
+        }
+
+        .nav-link.mentor-link.active {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+
+        .nav-link.coord-link:hover {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--coord-primary);
+        }
+
+        .nav-link.coord-link.active {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        .nav-link.emprendedor-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+
+        .nav-link.emprendedor-link.active {
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+        }
+
         .container {
             max-width: 1400px;
             margin: 2rem auto;
@@ -111,11 +148,43 @@
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
+            animation: slideDown 0.4s ease;
         }
 
-        .alert-success { background: #d4edda; color: #155724; }
-        .alert-error { background: #f8d7da; color: #721c24; }
-        .alert-info { background: #cce5ff; color: #004085; }
+        @keyframes slideDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success { 
+            background: #d4edda; 
+            color: #155724; 
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-info { 
+            background: #cce5ff; 
+            color: #004085; 
+            border-left: 4px solid #0d6efd;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
 
         .btn {
             padding: 0.8rem 1.5rem;
@@ -135,39 +204,134 @@
             background: #3c2bb7;
             transform: translateY(-1px);
         }
+
+        /* Hamburger menu para móvil */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                display: none;
+                gap: 0.5rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .brand span {
+                font-size: 1.2rem;
+            }
+
+            .brand img {
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .brand span {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="brand">
-            <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="StartPn Jr" class="Fondo login">
-            <!-- Mantener solo la versión en negrita -->
-            <span class="brand-name"><strong>StartPn Jr</strong></span>
-            <!-- Quitar cualquier otra línea que contenga "StartPn Jr" duplicada -->
-        </div>
-        <div class="nav-links">
-            {% if session.get('user') %}
-                <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
-                    <i class="fas fa-home"></i> Inicio
-                </a>
-                
-                {% if session.get('rol') == 'Administrador' %}
-                    <a href="{{ url_for('home_admin') }}" class="nav-link {% if request.endpoint == 'home_admin' %}active{% endif %}">
-                        <i class="fas fa-user-shield"></i> Panel Admin
+        <div class="navbar-container">
+            <a href="{{ url_for('login') if not session.get('user') else url_for('home') }}" class="brand">
+                <img src="{{ url_for('static', filename='img/Fondo-login.png') }}" alt="StartPn Jr">
+                <span><strong>StartPn Jr</strong></span>
+            </a>
+
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                {% if session.get('user') %}
+                    
+                    {# Ocultar "Inicio" solo para Emprendedor y Mentor #}
+                    {% if session.get('rol') not in ['Emprendedor', 'Mentor'] %}
+                        <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    {% endif %}
+
+                    {# Mostrar Panel Admin solo si es administrador #}
+                    {% if session.get('rol') == 'Administrador' %}
+                        <a href="{{ url_for('home_admin') }}" class="nav-link admin-link {% if request.endpoint == 'home_admin' %}active{% endif %}">
+                            <i class="fas fa-user-shield"></i> Panel Admin
+                        </a>
+                    {% endif %}
+
+                    {# Mostrar Panel Coordinador si tiene ese rol #}
+                    {% if session.get('rol') == 'Coordinador' %}
+                        <a href="{{ url_for('panel_coordinador') }}" class="nav-link coord-link {% if request.endpoint == 'panel_coordinador' %}active{% endif %}">
+                            <i class="fas fa-tasks"></i> Panel Coordinador
+                        </a>
+                    {% endif %}
+
+                    {# Mostrar Panel Mentor si tiene ese rol #}
+                    {% if session.get('rol') == 'Mentor' %}
+                        <a href="{{ url_for('panel_mentor') }}" class="nav-link mentor-link {% if request.endpoint == 'panel_mentor' %}active{% endif %}">
+                            <i class="fas fa-chalkboard-teacher"></i> Mi Panel
+                        </a>
+                    {% endif %}
+
+                    {# Mostrar Panel Emprendedor si tiene ese rol #}
+                    {% if session.get('rol') == 'Emprendedor' %}
+                        <a href="{{ url_for('panel_emprendedor') }}" class="nav-link emprendedor-link {% if request.endpoint == 'panel_emprendedor' %}active{% endif %}">
+                            <i class="fas fa-rocket"></i> Mi Panel
+                        </a>
+                    {% endif %}
+
+                    {# Cerrar sesión siempre visible #}
+                    <a href="{{ url_for('logout') }}" class="nav-link btn-primary">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </a>
+
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                    <a href="{{ url_for('register') }}" class="nav-link btn-primary">
+                        <i class="fas fa-user-plus"></i> Registrarse
                     </a>
                 {% endif %}
-                
-                {% if session.get('rol') == 'Emprendedor' %}
-                    <a href="{{ url_for('panel_emprendedor') }}" class="nav-link {% if request.endpoint == 'panel_emprendedor' %}active{% endif %}">
-                        <i class="fas fa-rocket"></i> Mi Panel
-                    </a>
-                {% endif %}
-                
-                <a href="{{ url_for('logout') }}" class="nav-link btn-primary">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-                </a>
-            {% endif %}
+            </div>
         </div>
     </nav>
 
@@ -176,7 +340,20 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">
+                        <strong>
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% elif category == 'info' %}
+                                <i class="fas fa-info-circle"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% endif %}
+                        </strong>
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
@@ -187,7 +364,29 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Funciones comunes
+        // Toggle menu mobile
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Cerrar menú al hacer clic en un enlace (móvil)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('navLinks').classList.remove('active');
+                }
+            });
+        });
+
+        // Cerrar menú al redimensionar ventana
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.getElementById('navLinks').classList.remove('active');
+            }
+        });
+
+        // Funciones comunes de utilidad
         function showLoading(message = 'Procesando...') {
             Swal.fire({
                 title: message,
@@ -196,12 +395,15 @@
             });
         }
 
-        function showSuccess(message) {
+        function showSuccess(message, callback = null) {
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
                 text: message,
-                timer: 2000
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                if (callback) callback();
             });
         }
 
@@ -209,9 +411,58 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: message
+                text: message,
+                confirmButtonColor: '#4834d4'
             });
         }
+
+        function showConfirm(title, text, confirmCallback) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4834d4',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed && confirmCallback) {
+                    confirmCallback();
+                }
+            });
+        }
+
+        // Auto-ocultar alertas después de 5 segundos
+        document.addEventListener('DOMContentLoaded', () => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+
+        // Prevenir envío múltiple de formularios
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                    
+                    // Rehabilitar después de 3 segundos por si hay error
+                    setTimeout(() => {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Enviar';
+                        }
+                    }, 3000);
+                }
+            });
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>

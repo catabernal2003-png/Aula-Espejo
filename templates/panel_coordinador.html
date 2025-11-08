@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+{% block title %}Panel del Coordinador{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --coord-primary: #059669;
+    --coord-secondary: #10b981;
+    --coord-accent: #34d399;
+}
+
+.coord-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.coord-header {
+    background: linear-gradient(135deg, var(--coord-primary), var(--coord-secondary));
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 30px rgba(5, 150, 105, 0.2);
+}
+
+.coord-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    border: 2px solid var(--coord-primary);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--coord-primary);
+}
+
+.metric-label {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.content-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title i {
+    color: var(--coord-primary);
+}
+
+.approval-card {
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.approval-card:hover {
+    border-color: var(--coord-primary);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+}
+
+.approval-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.approval-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #1f2937;
+}
+
+.approval-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.btn-approve {
+    flex: 1;
+    background: var(--coord-primary);
+    color: white;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-approve:hover {
+    background: #047857;
+}
+
+.btn-reject {
+    flex: 1;
+    background: #ef4444;
+    color: white;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-reject:hover {
+    background: #dc2626;
+}
+
+.assignment-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-select {
+    padding: 0.8rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--coord-primary);
+}
+
+.btn-assign {
+    background: var(--coord-primary);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    height: fit-content;
+}
+
+.mentor-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mentor-table thead {
+    background: #f9fafb;
+}
+
+.mentor-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.mentor-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mentor-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+@media (max-width: 1024px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .assignment-form {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="coord-dashboard">
+    <div class="coord-header">
+        <h1>Panel del Coordinador</h1>
+        <p>Supervisa programas, mentoría y aprueba contenido educativo</p>
+    </div>
+
+    <!-- Métricas -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">{{ total_mentores or 0 }}</div>
+            <div class="metric-label">Mentores Activos</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ total_emprendedores or 0 }}</div>
+            <div class="metric-label">Emprendedores</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ contenido_pendiente or 0 }}</div>
+            <div class="metric-label">Contenido Pendiente</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ asignaciones_mes or 0 }}</div>
+            <div class="metric-label">Asignaciones este mes</div>
+        </div>
+    </div>
+
+    <!-- Contenido pendiente de aprobación -->
+    <div class="content-section">
+        <h2 class="section-title">
+            <i class="fas fa-clipboard-check"></i>
+            Contenido Pendiente de Aprobación
+        </h2>
+
+        {% if contenidos_pendientes %}
+            {% for contenido in contenidos_pendientes %}
+            <div class="approval-card">
+                <div class="approval-header">
+                    <div>
+                        <div class="approval-title">{{ contenido.titulo }}</div>
+                        <div class="approval-meta">
+                            <span><i class="fas fa-user"></i> {{ contenido.mentor_nombre }}</span>
+                            <span><i class="fas fa-layer-group"></i> {{ contenido.fase|upper }}</span>
+                            <span><i class="fas fa-file-alt"></i> {{ contenido.tipo|capitalize }}</span>
+                            <span><i class="fas fa-calendar"></i> {{ contenido.created_at.strftime('%d/%m/%Y') if contenido.created_at }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="color: #6b7280; margin: 0.8rem 0;">
+                    {{ contenido.descripcion }}
+                </p>
+
+                <details style="margin-top: 1rem;">
+                    <summary style="cursor: pointer; font-weight: 600; color: #374151;">
+                        Ver contenido completo
+                    </summary>
+                    <div style="margin-top: 1rem; padding: 1rem; background: #f9fafb; border-radius: 8px; white-space: pre-wrap;">
+                        {{ contenido.contenido[:500] }}{% if contenido.contenido|length > 500 %}...{% endif %}
+                    </div>
+                </details>
+
+                <form action="{{ url_for('coordinador_aprobar_contenido', contenido_id=contenido.id) }}" method="POST">
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">Comentario (opcional)</label>
+                        <textarea name="comentario" style="width: 100%; padding: 0.7rem; border: 2px solid #e5e7eb; border-radius: 8px; min-height: 80px;"></textarea>
+                    </div>
+
+                    <div class="approval-actions">
+                        <button type="submit" name="accion" value="aprobar" class="btn-approve">
+                            <i class="fas fa-check"></i> Aprobar
+                        </button>
+                        <button type="submit" name="accion" value="rechazar" class="btn-reject">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p style="text-align: center; color: #6b7280; padding: 2rem;">
+            No hay contenido pendiente de aprobación.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Asignación de mentores -->
+    <div class="content-section">
+        <h2 class="section-title">
+            <i class="fas fa-user-plus"></i>
+            Asignar Mentor a Emprendedor
+        </h2>
+
+        <form action="{{ url_for('coordinador_asignar_mentor') }}" method="POST" class="assignment-form">
+            <div class="form-group">
+                <label class="form-label">Mentor</label>
+                <select name="mentor_id" class="form-select" required>
+                    <option value="">Seleccionar mentor...</option>
+                    {% for mentor in mentores %}
+                    <option value="{{ mentor.id }}">{{ mentor.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Emprendedor</label>
+                <select name="emprendedor_id" class="form-select" required>
+                    <option value="">Seleccionar emprendedor...</option>
+                    {% for emp in emprendedores_sin_asignar %}
+                    <option value="{{ emp.id }}">{{ emp.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-assign">
+                <i class="fas fa-link"></i> Asignar
+            </button>
+        </form>
+    </div>
+
+    <!-- Vista de mentores y sus asignaciones -->
+    <div class="content-section">
+        <h2 class="section-title">
+            <i class="fas fa-users"></i>
+            Mentores y Asignaciones
+        </h2>
+
+        {% if mentores_con_asignaciones %}
+        <table class="mentor-table">
+            <thead>
+                <tr>
+                    <th>Mentor</th>
+                    <th>Emprendedores Asignados</th>
+                    <th>Proyectos Supervisados</th>
+                    <th>Sesiones Completadas</th>
+                    <th>Contenidos Aprobados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mentor in mentores_con_asignaciones %}
+                <tr>
+                    <td><strong>{{ mentor.username }}</strong></td>
+                    <td>{{ mentor.total_emprendedores or 0 }}</td>
+                    <td>{{ mentor.total_proyectos or 0 }}</td>
+                    <td>{{ mentor.sesiones_completadas or 0 }}</td>
+                    <td>{{ mentor.contenidos_aprobados or 0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align: center; color: #6b7280; padding: 2rem;">
+            No hay mentores registrados en el sistema.
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}

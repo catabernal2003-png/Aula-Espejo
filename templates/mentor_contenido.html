@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Contenido{% endblock %}
+
+{% block content %}
+<style>
+.contenido-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 20px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.btn-new-content {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-new-content:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.content-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab {
+    padding: 0.8rem 1.5rem;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+.tab:hover:not(.active) {
+    border-color: #8b5cf6;
+}
+
+.contenido-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.contenido-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.contenido-card:hover {
+    border-color: #8b5cf6;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+}
+
+.contenido-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.contenido-tipo {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.estado-badge {
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.estado-pendiente {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.estado-aprobado {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.estado-rechazado {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.contenido-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.8rem;
+}
+
+.contenido-description {
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.contenido-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.contenido-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.contenido-feedback {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #8b5cf6;
+}
+
+.feedback-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.feedback-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #1f2937;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    padding: 0.9rem 2rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #8b5cf6;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.back-button:hover {
+    background: #f3f4f6;
+    transform: translateX(-5px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+</style>
+
+<div class="contenido-container">
+    <a href="{{ url_for('panel_mentor') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+    </a>
+
+    <div class="page-header">
+        <div>
+            <h1>Gestión de Contenido Educativo</h1>
+            <p>Crea y gestiona recursos para tus emprendedores</p>
+        </div>
+        <button class="btn-new-content" onclick="openModal()">
+            <i class="fas fa-plus"></i> Nuevo Contenido
+        </button>
+    </div>
+
+    <!-- Tabs de filtrado -->
+    <div class="content-tabs">
+        <div class="tab active" onclick="filterContent('todos')">
+            Todos
+        </div>
+        <div class="tab" onclick="filterContent('pendiente')">
+            Pendientes
+        </div>
+        <div class="tab" onclick="filterContent('aprobado')">
+            Aprobados
+        </div>
+        <div class="tab" onclick="filterContent('rechazado')">
+            Rechazados
+        </div>
+    </div>
+
+    <!-- Grid de contenidos -->
+    {% if contenidos %}
+    <div class="contenido-grid">
+        {% for contenido in contenidos %}
+        <div class="contenido-card" data-estado="{{ contenido.estado }}">
+            <div class="contenido-header">
+                <span class="contenido-tipo">
+                    <i class="fas fa-{{ 'file-alt' if contenido.tipo == 'recurso' else 'book' if contenido.tipo == 'guia' else 'graduation-cap' if contenido.tipo == 'tutorial' else 'file' }}"></i>
+                    {{ contenido.tipo|capitalize }}
+                </span>
+                <span class="estado-badge estado-{{ contenido.estado }}">
+                    {{ contenido.estado|capitalize }}
+                </span>
+            </div>
+
+            <h3 class="contenido-title">{{ contenido.titulo }}</h3>
+            <p class="contenido-description">
+                {{ contenido.descripcion[:120] }}{% if contenido.descripcion|length > 120 %}...{% endif %}
+            </p>
+
+            <div class="contenido-meta">
+                <div class="contenido-meta-item">
+                    <i class="fas fa-layer-group"></i>
+                    <span>{{ contenido.fase|upper }}</span>
+                </div>
+                <div class="contenido-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>{{ contenido.created_at.strftime('%d/%m/%Y') if contenido.created_at }}</span>
+                </div>
+            </div>
+
+            {% if contenido.estado == 'aprobado' and contenido.aprobado_por_nombre %}
+            <div class="contenido-feedback" style="border-left-color: #10b981;">
+                <div class="feedback-label">✓ Aprobado por {{ contenido.aprobado_por_nombre }}</div>
+                {% if contenido.comentario_aprobacion %}
+                <div class="feedback-text">{{ contenido.comentario_aprobacion }}</div>
+                {% endif %}
+            </div>
+            {% elif contenido.estado == 'rechazado' %}
+            <div class="contenido-feedback" style="border-left-color: #ef4444;">
+                <div class="feedback-label">✗ Rechazado</div>
+                {% if contenido.comentario_aprobacion %}
+                <div class="feedback-text">{{ contenido.comentario_aprobacion }}</div>
+                {% endif %}
+            </div>
+            {% elif contenido.estado == 'pendiente' %}
+            <div class="contenido-feedback" style="border-left-color: #f59e0b;">
+                <div class="feedback-label">⏳ Pendiente de revisión</div>
+                <div class="feedback-text">Este contenido será revisado por el coordinador del programa.</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-folder-open"></i>
+        <h3>No has creado contenido aún</h3>
+        <p>Crea tu primer recurso educativo para compartir con tus emprendedores.</p>
+        <button class="btn-submit" onclick="openModal()" style="max-width: 300px; margin: 1rem auto;">
+            <i class="fas fa-plus"></i> Crear Primer Contenido
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de nuevo contenido -->
+<div id="contentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Crear Nuevo Contenido</h2>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+
+        <form action="{{ url_for('mentor_crear_contenido') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Título *</label>
+                <input type="text" name="titulo" class="form-input" required 
+                       placeholder="Ej: Guía para validación de mercado">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tipo de contenido *</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="recurso">Recurso</option>
+                    <option value="guia">Guía</option>
+                    <option value="tutorial">Tutorial</option>
+                    <option value="plantilla">Plantilla</option>
+                    <option value="video">Video</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Fase del programa *</label>
+                <select name="fase" class="form-select" required>
+                    <option value="fase1">Fase 1 - Ideación</option>
+                    <option value="fase2">Fase 2 - Validación</option>
+                    <option value="fase3">Fase 3 - Prototipado</option>
+                    <option value="general">General</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Descripción breve *</label>
+                <textarea name="descripcion" class="form-textarea" required
+                          placeholder="Describe brevemente de qué trata este contenido..." style="min-height: 80px;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Contenido *</label>
+                <textarea name="contenido" class="form-textarea" required
+                          placeholder="Escribe aquí el contenido completo. Puedes usar Markdown para formato."></textarea>
+            </div>
+
+            <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">
+                <i class="fas fa-info-circle"></i> Este contenido será enviado al coordinador para su revisión y aprobación.
+            </p>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Enviar para Aprobación
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById('contentModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('contentModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+function filterContent(estado) {
+    // Actualizar tabs
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Filtrar cards
+    const cards = document.querySelectorAll('.contenido-card');
+    cards.forEach(card => {
+        if (estado === 'todos' || card.dataset.estado === estado) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('contentModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+</script>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}

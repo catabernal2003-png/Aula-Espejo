@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+{% block title %}Panel del Mentor{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --mentor-primary: #8b5cf6;
+    --mentor-secondary: #a78bfa;
+    --mentor-accent: #c4b5fd;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+}
+
+.mentor-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Header del mentor */
+.mentor-header {
+    background: linear-gradient(135deg, var(--mentor-primary), var(--mentor-secondary));
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+.mentor-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.mentor-header p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+/* Grid principal */
+.mentor-main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Sidebar */
+.mentor-sidebar {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.2rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.9rem;
+    border-radius: 10px;
+    margin-bottom: 0.6rem;
+    text-decoration: none;
+    color: #1f2937;
+    transition: all 0.3s ease;
+    background: rgba(139, 92, 246, 0.02);
+}
+
+.sidebar-item:hover {
+    background: rgba(139, 92, 246, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar-item i {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--mentor-primary), var(--mentor-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.95rem;
+}
+
+/* Métricas */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+    border-color: var(--mentor-primary);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--mentor-primary);
+    margin-bottom: 0.5rem;
+}
+
+.metric-label {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Secciones de contenido */
+.content-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.section-title i {
+    color: var(--mentor-primary);
+}
+
+/* Tabla de emprendedores */
+.emprendedores-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.emprendedores-table thead {
+    background: #f9fafb;
+}
+
+.emprendedores-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.emprendedores-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.emprendedores-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Proyectos recientes */
+.proyecto-item {
+    padding: 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.proyecto-item:hover {
+    border-color: var(--mentor-primary);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.proyecto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.8rem;
+}
+
+.proyecto-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.proyecto-emprendedor {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.progreso-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--mentor-primary), var(--mentor-secondary));
+    transition: width 0.4s ease;
+}
+
+/* Sesiones próximas */
+.sesion-item {
+    padding: 1rem;
+    border-left: 4px solid var(--mentor-primary);
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.sesion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sesion-tema {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.sesion-fecha {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-pending {
+    background: #fce7f3;
+    color: #9f1239;
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, var(--mentor-primary), var(--mentor-secondary));
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--mentor-primary);
+    border: 2px solid var(--mentor-primary);
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background: var(--mentor-primary);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .mentor-main-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mentor-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .emprendedores-table {
+        font-size: 0.9rem;
+    }
+    
+    .emprendedores-table th,
+    .emprendedores-table td {
+        padding: 0.7rem;
+    }
+}
+</style>
+
+<div class="mentor-dashboard">
+    <!-- Header -->
+    <div class="mentor-header">
+        <h1>Panel del Mentor</h1>
+        <p>Bienvenido, <strong>{{ mentor.username }}</strong> — Guía y apoya a tus emprendedores asignados</p>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value">{{ estadisticas.total_emprendedores or 0 }}</div>
+            <div class="metric-label">Emprendedores</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ estadisticas.total_proyectos or 0 }}</div>
+            <div class="metric-label">Proyectos</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ (estadisticas.promedio_progreso or 0)|round(1) }}%</div>
+            <div class="metric-label">Progreso Promedio</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-value">{{ contenido_pendiente or 0 }}</div>
+            <div class="metric-label">Contenido Pendiente</div>
+        </div>
+    </div>
+
+    <!-- Grid principal -->
+    <div class="mentor-main-grid">
+        <!-- Sidebar -->
+        <aside class="mentor-sidebar">
+            <h3 class="sidebar-title">Acciones Rápidas</h3>
+            
+            <a href="{{ url_for('mentor_emprendedores') }}" class="sidebar-item">
+                <i class="fas fa-users"></i>
+                <span>Mis Emprendedores</span>
+            </a>
+            
+            <a href="{{ url_for('mentor_sesiones') }}" class="sidebar-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Sesiones de Mentoría</span>
+            </a>
+            
+            <a href="{{ url_for('mentor_contenido') }}" class="sidebar-item">
+                <i class="fas fa-book"></i>
+                <span>Mi Contenido</span>
+            </a>
+            
+            <a href="{{ url_for('home') }}" class="sidebar-item">
+                <i class="fas fa-home"></i>
+                <span>Vista General</span>
+            </a>
+        </aside>
+
+        <!-- Contenido principal -->
+        <div class="mentor-content">
+            <!-- Emprendedores asignados -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-graduate"></i>
+                        Emprendedores Asignados
+                    </h2>
+                    <a href="{{ url_for('mentor_emprendedores') }}" class="btn-secondary">
+                        Ver Todos <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                {% if emprendedores %}
+                <table class="emprendedores-table">
+                    <thead>
+                        <tr>
+                            <th>Emprendedor</th>
+                            <th>Proyectos</th>
+                            <th>Fecha Asignación</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in emprendedores[:5] %}
+                        <tr>
+                            <td><strong>{{ emp.username }}</strong></td>
+                            <td>{{ emp.total_proyectos or 0 }}</td>
+                            <td>{{ emp.fecha_asignacion.strftime('%d/%m/%Y') if emp.fecha_asignacion }}</td>
+                            <td>
+                                <a href="{{ url_for('mentor_ver_emprendedor', emprendedor_id=emp.id) }}" 
+                                   class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                    Ver Perfil
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    No tienes emprendedores asignados aún.
+                </p>
+                {% endif %}
+            </section>
+
+            <!-- Proyectos recientes -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-rocket"></i>
+                        Proyectos Recientes
+                    </h2>
+                </div>
+                
+                {% if proyectos_recientes %}
+                    {% for proyecto in proyectos_recientes[:5] %}
+                    <div class="proyecto-item">
+                        <div class="proyecto-header">
+                            <div>
+                                <div class="proyecto-title">{{ proyecto.title }}</div>
+                                <div class="proyecto-emprendedor">
+                                    <i class="fas fa-user"></i> {{ proyecto.emprendedor_nombre }}
+                                </div>
+                            </div>
+                            <span class="badge badge-info">{{ proyecto.category or 'General' }}</span>
+                        </div>
+                        
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0.5rem 0;">
+                            {{ proyecto.description[:120] }}{% if proyecto.description|length > 120 %}...{% endif %}
+                        </p>
+                        
+                        <div>
+                            <small style="color: #6b7280;">Progreso: {{ proyecto.progreso or 0 }}%</small>
+                            <div class="progreso-bar">
+                                <div class="progreso-fill" style="width: {{ proyecto.progreso or 0 }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    No hay proyectos recientes.
+                </p>
+                {% endif %}
+            </section>
+
+            <!-- Próximas sesiones -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Próximas Sesiones
+                    </h2>
+                    <a href="{{ url_for('mentor_sesiones') }}" class="btn-secondary">
+                        Ver Todas
+                    </a>
+                </div>
+                
+                {% if sesiones_proximas %}
+                    {% for sesion in sesiones_proximas %}
+                    <div class="sesion-item">
+                        <div class="sesion-header">
+                            <div class="sesion-tema">{{ sesion.tema }}</div>
+                            <span class="badge badge-warning">{{ sesion.modalidad }}</span>
+                        </div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">
+                            <i class="fas fa-user"></i> {{ sesion.emprendedor_nombre }}
+                        </div>
+                        <div class="sesion-fecha">
+                            <i class="fas fa-calendar"></i> 
+                            {{ sesion.fecha.strftime('%d/%m/%Y') }} a las {{ sesion.hora.strftime('%H:%M') if sesion.hora }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    No hay sesiones programadas próximamente.
+                </p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}
