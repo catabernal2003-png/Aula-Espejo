@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import mysql.connector
+import traceback
 from mysql.connector import Error
 from ml_model_multiclass import train_model, predict_project, MODEL_PATH
 
@@ -549,6 +550,10 @@ def save_user_data(user_id, data):
         print(f"Error saving user data: {e}")
         return False
 
+# ============================================
+# INTEGRACIÓN EMPRENDEDOR - MENTOR
+# ============================================
+
 @app.route('/panel_emprendedor', methods=['GET'])
 def panel_emprendedor():
     if 'user_id' not in session:
@@ -561,55 +566,373 @@ def panel_emprendedor():
         "rol": session.get('rol')
     }
 
-    data = load_user_data(user['id'])
-    proyectos = normalize_proyectos(data.get('projects', []))
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Obtener información del mentor asignado (SI TIENE)
+        cursor.execute("""
+            SELECT u.id, u.username, me.fecha_asignacion
+            FROM mentor_emprendedor me
+            JOIN users u ON me.mentor_id = u.id
+            WHERE me.emprendedor_id = %s AND me.estado = 'activo'
+            LIMIT 1
+        """, (user['id'],))
+        mentor_asignado = cursor.fetchone()
+        
+        # Obtener proyectos del emprendedor
+        cursor.execute("""
+            SELECT * FROM proyectos 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (user['id'],))
+        proyectos = cursor.fetchall()
+        
+        # Obtener contenido aprobado disponible
+        cursor.execute("""
+            SELECT c.*, u.username as mentor_nombre
+            FROM contenido_mentor c
+            JOIN users u ON c.mentor_id = u.id
+            WHERE c.estado = 'aprobado'
+            ORDER BY c.created_at DESC
+            LIMIT 10
+        """)
+        contenido_disponible = cursor.fetchall()
+        
+        # Obtener próximas sesiones con el mentor
+        proximas_sesiones = []
+        if mentor_asignado:
+            cursor.execute("""
+                SELECT * FROM sesiones_mentoria
+                WHERE emprendedor_id = %s 
+                AND mentor_id = %s
+                AND fecha >= CURDATE()
+                AND estado != 'cancelada'
+                ORDER BY fecha, hora
+                LIMIT 5
+            """, (user['id'], mentor_asignado['id']))
+            proximas_sesiones = cursor.fetchall()
+        
+        # Obtener mensajes/notas del mentor (últimas 5)
+        notas_mentor = []
+        if mentor_asignado:
+            cursor.execute("""
+                SELECT * FROM notas_mentor
+                WHERE emprendedor_id = %s AND mentor_id = %s
+                ORDER BY created_at DESC
+                LIMIT 5
+            """, (user['id'], mentor_asignado['id']))
+            notas_mentor = cursor.fetchall()
+        
+        # Obtener objetivos asignados por el mentor
+        objetivos = []
+        if mentor_asignado:
+            cursor.execute("""
+                SELECT * FROM objetivos_emprendedor
+                WHERE emprendedor_id = %s AND mentor_id = %s
+                ORDER BY 
+                    CASE estado
+                        WHEN 'en_progreso' THEN 1
+                        WHEN 'pendiente' THEN 2
+                        WHEN 'completado' THEN 3
+                        WHEN 'vencido' THEN 4
+                    END,
+                    fecha_limite
+            """, (user['id'], mentor_asignado['id']))
+            objetivos = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        # Cargar datos del usuario (sistema antiguo - por compatibilidad)
+        data = load_user_data(user['id'])
+        
+        # Initialize progress if not exists
+        if 'progreso' not in data:
+            data['progreso'] = {
+                'level': 1,
+                'points': 0,
+                'badges': 0,
+                'total_activities': 0,
+                'completed_activities': 0
+            }
+        
+        # Convertir proyectos a formato antiguo para compatibilidad
+        data['projects'] = []
+        for p in proyectos:
+            data['projects'].append({
+                'id': p['id'],
+                'title': p['title'],
+                'description': p['description'],
+                'progress': p['progreso'],
+                'category': p.get('category', 'General'),
+                'created_at': p['created_at'].isoformat() if p['created_at'] else ''
+            })
+        
+        # Agregar datos del mentor al contexto
+        data['mentor'] = mentor_asignado
+        data['proximas_sesiones'] = proximas_sesiones
+        data['notas_mentor'] = notas_mentor
+        data['objetivos'] = objetivos
+        data['contenido_disponible'] = contenido_disponible
+        
+        return render_template('panel_emprendedor.html', user=user, data=data)
+        
+    except Exception as e:
+        print(f"Error en panel_emprendedor: {e}")
+        flash('Error al cargar el panel', 'error')
+        return redirect(url_for('login'))
 
-    # Asignar IDs únicos si no los tienen
-    for i, p in enumerate(proyectos):
-        p['id'] = p.get('id', i + 1)
 
-    # Initialize progress if not exists
-    if 'progreso' not in data:
-        data['progreso'] = {
-            'level': 1,
-            'points': 0,
-            'badges': 0,
-            'total_activities': 0,
-            'completed_activities': 0
-        }
-
-    # Calculate progress percentage for each project
-    if 'projects' in data:
-        for project in data.get('proyectos', []):
-            if 'progreso' not in project:
-                project['progreso'] = 0
+@app.route('/emprendedor/solicitar_sesion', methods=['POST'])
+def emprendedor_solicitar_sesion():
+    """Permite al emprendedor solicitar una sesión con su mentor"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        return jsonify({'error': 'No autorizado'}), 401
     
-    # Get current date for activities
-    current_date = datetime.datetime.now()
-    
-    # Update activities with real upcoming workshops and mentorships
-    upcoming_activities = [
-        {
-            'date': (current_date + datetime.timedelta(days=7)).strftime('%Y-%m-%d'),
-            'title': 'Taller: Introducción al Emprendimiento',
-            'type': 'workshop'
-        },
-        {
-            'date': (current_date + datetime.timedelta(days=14)).strftime('%Y-%m-%d'),
-            'title': 'Mentoría: Desarrollo de Ideas',
-            'type': 'mentorship'
-        },
-        {
-            'date': (current_date + datetime.timedelta(days=21)).strftime('%Y-%m-%d'),
-            'title': 'Taller: Prototipado Rápido',
-            'type': 'workshop'
-        }
-    ]
-    
-    data['activities'] = upcoming_activities
-    save_user_data(user['id'], data)
+    try:
+        tema = request.form.get('tema', '').strip()
+        mensaje = request.form.get('mensaje', '').strip()
+        
+        if not tema:
+            return jsonify({'error': 'El tema es obligatorio'}), 400
+        
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Verificar que tiene mentor asignado
+        cursor.execute("""
+            SELECT mentor_id FROM mentor_emprendedor 
+            WHERE emprendedor_id = %s AND estado = 'activo'
+            LIMIT 1
+        """, (session['user_id'],))
+        
+        asignacion = cursor.fetchone()
+        
+        if not asignacion:
+            return jsonify({'error': 'No tienes un mentor asignado aún'}), 400
+        
+        # Crear solicitud de sesión (se guarda como nota especial para el mentor)
+        cursor.execute("""
+            INSERT INTO notas_mentor (mentor_id, emprendedor_id, nota, created_at)
+            VALUES (%s, %s, %s, NOW())
+        """, (asignacion['mentor_id'], session['user_id'], 
+              f"[SOLICITUD DE SESIÓN] {tema}\n\n{mensaje}"))
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        registrar_actividad(session['user_id'], f"Solicitó sesión con mentor: {tema}")
+        
+        flash('Solicitud enviada exitosamente a tu mentor', 'success')
+        return redirect(url_for('panel_emprendedor'))
+        
+    except Exception as e:
+        print(f"Error en emprendedor_solicitar_sesion: {e}")
+        flash('Error al enviar la solicitud', 'error')
+        return redirect(url_for('panel_emprendedor'))
 
-    return render_template('panel_emprendedor.html', user=user, data=data, proyectos=proyectos)
+
+@app.route('/emprendedor/marcar_objetivo/<int:objetivo_id>', methods=['POST'])
+def emprendedor_marcar_objetivo(objetivo_id):
+    """Marcar un objetivo como completado"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Verificar que el objetivo pertenece al emprendedor
+        cursor.execute("""
+            UPDATE objetivos_emprendedor 
+            SET estado = 'completado', updated_at = NOW()
+            WHERE id = %s AND emprendedor_id = %s
+        """, (objetivo_id, session['user_id']))
+        
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Objetivo no encontrado'}), 404
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        registrar_actividad(session['user_id'], f"Completó objetivo ID: {objetivo_id}")
+        
+        return jsonify({'success': True, 'message': 'Objetivo marcado como completado'})
+        
+    except Exception as e:
+        print(f"Error en emprendedor_marcar_objetivo: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/emprendedor/mi_mentor')
+def emprendedor_mi_mentor():
+    """Ver información detallada del mentor asignado"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Obtener mentor asignado
+        cursor.execute("""
+            SELECT u.id, u.username, me.fecha_asignacion
+            FROM mentor_emprendedor me
+            JOIN users u ON me.mentor_id = u.id
+            WHERE me.emprendedor_id = %s AND me.estado = 'activo'
+            LIMIT 1
+        """, (session['user_id'],))
+        
+        mentor = cursor.fetchone()
+        
+        if not mentor:
+            flash('Aún no tienes un mentor asignado', 'info')
+            return redirect(url_for('panel_emprendedor'))
+        
+        # Obtener sesiones pasadas
+        cursor.execute("""
+            SELECT * FROM sesiones_mentoria
+            WHERE emprendedor_id = %s AND mentor_id = %s
+            ORDER BY fecha DESC, hora DESC
+            LIMIT 20
+        """, (session['user_id'], mentor['id']))
+        sesiones = cursor.fetchall()
+        
+        # Obtener objetivos
+        cursor.execute("""
+            SELECT * FROM objetivos_emprendedor
+            WHERE emprendedor_id = %s AND mentor_id = %s
+            ORDER BY created_at DESC
+        """, (session['user_id'], mentor['id']))
+        objetivos = cursor.fetchall()
+        
+        # Obtener contenido creado por el mentor
+        cursor.execute("""
+            SELECT * FROM contenido_mentor
+            WHERE mentor_id = %s AND estado = 'aprobado'
+            ORDER BY created_at DESC
+            LIMIT 10
+        """, (mentor['id'],))
+        contenido_mentor = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        return render_template('emprendedor_mi_mentor.html',
+            mentor=mentor,
+            sesiones=sesiones,
+            objetivos=objetivos,
+            contenido_mentor=contenido_mentor
+        )
+        
+    except Exception as e:
+        print(f"Error en emprendedor_mi_mentor: {e}")
+        flash('Error al cargar la información del mentor', 'error')
+        return redirect(url_for('panel_emprendedor'))
+
+
+@app.route('/emprendedor/contenido')
+def emprendedor_contenido():
+    """Ver todo el contenido educativo disponible"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        fase = request.args.get('fase', 'todos')
+        tipo = request.args.get('tipo', 'todos')
+        
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Query base
+        query = """
+            SELECT c.*, u.username as mentor_nombre
+            FROM contenido_mentor c
+            JOIN users u ON c.mentor_id = u.id
+            WHERE c.estado = 'aprobado'
+        """
+        params = []
+        
+        # Filtros
+        if fase != 'todos':
+            query += " AND c.fase = %s"
+            params.append(fase)
+        
+        if tipo != 'todos':
+            query += " AND c.tipo = %s"
+            params.append(tipo)
+        
+        query += " ORDER BY c.created_at DESC"
+        
+        cursor.execute(query, params)
+        contenidos = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        return render_template('emprendedor_contenido.html',
+            contenidos=contenidos,
+            fase_actual=fase,
+            tipo_actual=tipo
+        )
+        
+    except Exception as e:
+        print(f"Error en emprendedor_contenido: {e}")
+        flash('Error al cargar el contenido', 'error')
+        return redirect(url_for('panel_emprendedor'))
+
+
+@app.route('/mentor/establecer_objetivo/<int:emprendedor_id>', methods=['POST'])
+def mentor_establecer_objetivo(emprendedor_id):
+    """Establecer un objetivo para un emprendedor"""
+    if 'user_id' not in session or session.get('rol') != 'Mentor':
+        return jsonify({'error': 'No autorizado'}), 401
+    
+    try:
+        titulo = request.form.get('titulo', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        fecha_limite = request.form.get('fecha_limite')
+        
+        if not titulo:
+            return jsonify({'error': 'El título es obligatorio'}), 400
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Verificar que el emprendedor está asignado
+        cursor.execute("""
+            SELECT id FROM mentor_emprendedor 
+            WHERE mentor_id = %s AND emprendedor_id = %s AND estado = 'activo'
+        """, (session['user_id'], emprendedor_id))
+        
+        if not cursor.fetchone():
+            return jsonify({'error': 'No tienes permiso'}), 403
+        
+        cursor.execute("""
+            INSERT INTO objetivos_emprendedor 
+            (mentor_id, emprendedor_id, titulo, descripcion, fecha_limite, estado, created_at)
+            VALUES (%s, %s, %s, %s, %s, 'pendiente', NOW())
+        """, (session['user_id'], emprendedor_id, titulo, descripcion, fecha_limite))
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        registrar_actividad(session['user_id'], f"Estableció objetivo para emprendedor ID: {emprendedor_id}")
+        
+        flash('Objetivo establecido exitosamente', 'success')
+        return redirect(url_for('mentor_ver_emprendedor', emprendedor_id=emprendedor_id))
+        
+    except Exception as e:
+        print(f"Error en mentor_establecer_objetivo: {e}")
+        flash('Error al establecer el objetivo', 'error')
+        return redirect(url_for('mentor_ver_emprendedor', emprendedor_id=emprendedor_id))
+
 
 @app.route('/actualizar-progreso/<int:project_id>', methods=['POST'])
 def actualizar_progreso_proyecto(project_id):
@@ -1370,22 +1693,127 @@ def mentor_actualizar_sesion(sesion_id):
 # RUTAS PARA EL COORDINADOR (SUPERVISIÓN)
 # ============================================
 
+@app.route('/panel_coordinador')
+def panel_coordinador():
+    """Dashboard principal del coordinador"""
+    if 'user_id' not in session or session.get('rol') != 'Coordinador':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Total de mentores
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM users WHERE rol_id = 3
+        """)
+        total_mentores = cursor.fetchone()['total']
+        
+        # Total de emprendedores
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM users WHERE rol_id = 4
+        """)
+        total_emprendedores = cursor.fetchone()['total']
+        
+        # Contenido pendiente
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM contenido_mentor WHERE estado = 'pendiente'
+        """)
+        contenido_pendiente = cursor.fetchone()['total']
+        
+        # Asignaciones este mes
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM mentor_emprendedor 
+            WHERE MONTH(fecha_asignacion) = MONTH(CURDATE())
+            AND YEAR(fecha_asignacion) = YEAR(CURDATE())
+        """)
+        asignaciones_mes = cursor.fetchone()['total']
+        
+        # Contenidos pendientes de aprobación
+        cursor.execute("""
+            SELECT c.*, u.username as mentor_nombre
+            FROM contenido_mentor c
+            JOIN users u ON c.mentor_id = u.id
+            WHERE c.estado = 'pendiente'
+            ORDER BY c.created_at DESC
+        """)
+        contenidos_pendientes = cursor.fetchall()
+        
+        # Lista de mentores para asignación
+        cursor.execute("""
+            SELECT id, username FROM users WHERE rol_id = 3
+        """)
+        mentores = cursor.fetchall()
+        
+        # Emprendedores sin asignar o para reasignar
+        cursor.execute("""
+            SELECT id, username FROM users WHERE rol_id = 4
+        """)
+        emprendedores_sin_asignar = cursor.fetchall()
+        
+        # Mentores con sus estadísticas
+        cursor.execute("""
+            SELECT 
+                u.id,
+                u.username,
+                COUNT(DISTINCT me.emprendedor_id) as total_emprendedores,
+                COUNT(DISTINCT p.id) as total_proyectos,
+                COUNT(DISTINCT CASE WHEN sm.estado = 'completada' THEN sm.id END) as sesiones_completadas,
+                COUNT(DISTINCT CASE WHEN cm.estado = 'aprobado' THEN cm.id END) as contenidos_aprobados
+            FROM users u
+            LEFT JOIN mentor_emprendedor me ON u.id = me.mentor_id AND me.estado = 'activo'
+            LEFT JOIN proyectos p ON me.emprendedor_id = p.user_id
+            LEFT JOIN sesiones_mentoria sm ON u.id = sm.mentor_id
+            LEFT JOIN contenido_mentor cm ON u.id = cm.mentor_id
+            WHERE u.rol_id = 3
+            GROUP BY u.id, u.username
+        """)
+        mentores_con_asignaciones = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        registrar_actividad(session['user_id'], "Accedió al panel de coordinador")
+        
+        return render_template('panel_coordinador.html',
+            total_mentores=total_mentores,
+            total_emprendedores=total_emprendedores,
+            contenido_pendiente=contenido_pendiente,
+            asignaciones_mes=asignaciones_mes,
+            contenidos_pendientes=contenidos_pendientes,
+            mentores=mentores,
+            emprendedores_sin_asignar=emprendedores_sin_asignar,
+            mentores_con_asignaciones=mentores_con_asignaciones
+        )
+        
+    except Exception as e:
+        print(f"Error en panel_coordinador: {e}")
+        flash('Error al cargar el panel del coordinador', 'error')
+        return redirect(url_for('home'))
+
+
 @app.route('/coordinador/aprobar_contenido/<int:contenido_id>', methods=['POST'])
 def coordinador_aprobar_contenido(contenido_id):
     """Aprobar o rechazar contenido creado por mentores"""
     if 'user_id' not in session or session.get('rol') != 'Coordinador':
-        return jsonify({'error': 'No autorizado'}), 401
+        flash('No tienes permiso para realizar esta acción', 'error')
+        return redirect(url_for('login'))
     
     try:
         accion = request.form.get('accion')  # 'aprobar' o 'rechazar'
-        comentario = request.form.get('comentario', '')
+        comentario = request.form.get('comentario', '').strip()
         
-        if accion not in ['aprobar', 'rechazar']:
-            return jsonify({'error': 'Acción inválida'}), 400
+        if not accion or accion not in ['aprobar', 'rechazar']:
+            flash('Acción inválida o faltante', 'error')
+            return redirect(url_for('panel_coordinador'))
         
         connection = get_db_connection()
+        if not connection:
+            flash('Error de conexión a la base de datos', 'error')
+            return redirect(url_for('panel_coordinador'))
         cursor = connection.cursor()
-        
+
         if accion == 'aprobar':
             cursor.execute("""
                 UPDATE contenido_mentor 
@@ -1396,7 +1824,7 @@ def coordinador_aprobar_contenido(contenido_id):
                 WHERE id = %s
             """, (session['user_id'], comentario, contenido_id))
             mensaje = 'Contenido aprobado exitosamente'
-        else:
+        else:  # rechazar
             cursor.execute("""
                 UPDATE contenido_mentor 
                 SET estado = 'rechazado', 
@@ -1408,43 +1836,56 @@ def coordinador_aprobar_contenido(contenido_id):
             mensaje = 'Contenido rechazado'
         
         connection.commit()
+        affected = cursor.rowcount
         cursor.close()
         connection.close()
-        
+
+        if affected == 0:
+            flash('No se encontró el contenido a actualizar', 'warning')
+            return redirect(url_for('panel_coordinador'))
+
         registrar_actividad(session['user_id'], f"{accion.capitalize()} contenido ID: {contenido_id}")
-        
-        return jsonify({'success': True, 'message': mensaje})
+        flash(mensaje, 'success')
+        return redirect(url_for('panel_coordinador'))
         
     except Exception as e:
-        print(f"Error en coordinador_aprobar_contenido: {e}")
-        return jsonify({'error': str(e)}), 500
-
+        # Imprimir traza completa en consola para depuración
+        print("Error en coordinador_aprobar_contenido:")
+        traceback.print_exc()
+        flash('Ocurrió un error al procesar la acción. Revisa la consola del servidor.', 'error')
+        return redirect(url_for('panel_coordinador'))
 
 @app.route('/coordinador/asignar_mentor', methods=['POST'])
 def coordinador_asignar_mentor():
     """Asignar emprendedor a mentor"""
     if 'user_id' not in session or session.get('rol') != 'Coordinador':
-        return jsonify({'error': 'No autorizado'}), 401
+        flash('No tienes permiso para realizar esta acción', 'error')
+        return redirect(url_for('login'))
     
     try:
         mentor_id = request.form.get('mentor_id')
         emprendedor_id = request.form.get('emprendedor_id')
         
         if not all([mentor_id, emprendedor_id]):
-            return jsonify({'error': 'Faltan datos requeridos'}), 400
+            flash('Debes seleccionar un mentor y un emprendedor', 'error')
+            return redirect(url_for('panel_coordinador'))
         
         connection = get_db_connection()
         cursor = connection.cursor()
         
-        # Verificar que no exista ya la asignación
+        # Verificar que no exista ya una asignación activa
         cursor.execute("""
             SELECT id FROM mentor_emprendedor 
             WHERE mentor_id = %s AND emprendedor_id = %s AND estado = 'activo'
         """, (mentor_id, emprendedor_id))
         
         if cursor.fetchone():
-            return jsonify({'error': 'El emprendedor ya está asignado a este mentor'}), 400
+            flash('Este emprendedor ya está asignado a este mentor', 'warning')
+            cursor.close()
+            connection.close()
+            return redirect(url_for('panel_coordinador'))
         
+        # Crear la asignación
         cursor.execute("""
             INSERT INTO mentor_emprendedor 
             (mentor_id, emprendedor_id, asignado_por, fecha_asignacion, estado)
@@ -1459,12 +1900,56 @@ def coordinador_asignar_mentor():
             f"Asignó emprendedor ID: {emprendedor_id} a mentor ID: {mentor_id}")
         
         flash('Emprendedor asignado exitosamente al mentor', 'success')
-        return redirect(url_for('admin_mentores'))
+        return redirect(url_for('panel_coordinador'))
         
     except Exception as e:
         print(f"Error en coordinador_asignar_mentor: {e}")
-        flash('Error al asignar el emprendedor', 'error')
-        return redirect(url_for('admin_mentores'))
+        flash(f'Error al asignar el emprendedor: {str(e)}', 'error')
+        return redirect(url_for('panel_coordinador'))
+
+
+@app.route('/coordinador/gestionar_mentores')
+def coordinador_gestionar_mentores():
+    """Ver y gestionar todos los mentores"""
+    if 'user_id' not in session or session.get('rol') != 'Coordinador':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Obtener todos los mentores con sus estadísticas
+        cursor.execute("""
+            SELECT 
+                u.id,
+                u.username,
+                COUNT(DISTINCT me.emprendedor_id) as total_emprendedores,
+                COUNT(DISTINCT p.id) as total_proyectos,
+                COUNT(DISTINCT sm.id) as total_sesiones,
+                COUNT(DISTINCT CASE WHEN sm.estado = 'completada' THEN sm.id END) as sesiones_completadas,
+                COUNT(DISTINCT cm.id) as contenidos_creados,
+                COUNT(DISTINCT CASE WHEN cm.estado = 'aprobado' THEN cm.id END) as contenidos_aprobados
+            FROM users u
+            LEFT JOIN mentor_emprendedor me ON u.id = me.mentor_id AND me.estado = 'activo'
+            LEFT JOIN proyectos p ON me.emprendedor_id = p.user_id
+            LEFT JOIN sesiones_mentoria sm ON u.id = sm.mentor_id
+            LEFT JOIN contenido_mentor cm ON u.id = cm.mentor_id
+            WHERE u.rol_id = 3
+            GROUP BY u.id, u.username
+            ORDER BY total_emprendedores DESC
+        """)
+        mentores = cursor.fetchall()
+        
+        cursor.close()
+        connection.close()
+        
+        return render_template('coordinador_mentores.html', mentores=mentores)
+        
+    except Exception as e:
+        print(f"Error en coordinador_gestionar_mentores: {e}")
+        flash('Error al cargar la información de mentores', 'error')
+        return redirect(url_for('panel_coordinador'))
 
 
 @app.route('/mentoria')
@@ -1487,128 +1972,6 @@ def mentoria():
         ]
     )
 
-
-@app.route('/panel_coordinador')
-def panel_coordinador():
-    """Panel principal del coordinador: métricas y contenido pendiente."""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    if session.get('rol') != 'Coordinador':
-        flash('No tienes permiso para acceder a esta página', 'error')
-        return redirect(url_for('home'))
-
-    # Valores por defecto
-    total_mentores = 0
-    total_emprendedores = 0
-    contenido_pendiente = 0
-    asignaciones_mes = 0
-    contenidos_pendientes = []
-    mentores = []
-    emprendedores_sin_asignar = []
-    mentores_con_asignaciones = []
-
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        # Contadores básicos
-        try:
-            cursor.execute("SELECT COUNT(*) AS total_mentores FROM users u JOIN roles r ON u.rol_id = r.id WHERE r.nombre = 'Mentor'")
-            total_mentores = cursor.fetchone()['total_mentores'] or 0
-        except Exception:
-            total_mentores = 0
-
-        try:
-            cursor.execute("SELECT COUNT(*) AS total_emprendedores FROM users u JOIN roles r ON u.rol_id = r.id WHERE r.nombre = 'Emprendedor'")
-            total_emprendedores = cursor.fetchone()['total_emprendedores'] or 0
-        except Exception:
-            total_emprendedores = 0
-
-        # Contenido pendiente (tabla contenido_mentor)
-        try:
-            cursor.execute("SELECT COUNT(*) AS contenido_pendiente FROM contenido_mentor WHERE estado = 'pendiente'")
-            contenido_pendiente = cursor.fetchone()['contenido_pendiente'] or 0
-
-            cursor.execute(
-                """
-                SELECT c.id, c.titulo, c.descripcion, c.contenido, c.fase, c.tipo, c.created_at,
-                       u.username AS mentor_nombre
-                FROM contenido_mentor c
-                LEFT JOIN users u ON c.mentor_id = u.id
-                WHERE c.estado = 'pendiente'
-                ORDER BY c.created_at DESC
-                LIMIT 20
-                """
-            )
-            contenidos_pendientes = cursor.fetchall() or []
-        except Exception:
-            contenido_pendiente = 0
-            contenidos_pendientes = []
-
-        # Asignaciones del mes
-        try:
-            cursor.execute("SELECT COUNT(*) AS asignaciones_mes FROM mentor_emprendedor WHERE MONTH(fecha_asignacion) = MONTH(NOW()) AND YEAR(fecha_asignacion) = YEAR(NOW()) AND estado = 'activo'")
-            asignaciones_mes = cursor.fetchone()['asignaciones_mes'] or 0
-        except Exception:
-            asignaciones_mes = 0
-
-        # Mentores para selector
-        try:
-            cursor.execute("SELECT u.id, u.username FROM users u JOIN roles r ON u.rol_id = r.id WHERE r.nombre = 'Mentor'")
-            mentores = cursor.fetchall() or []
-        except Exception:
-            mentores = []
-
-        # Emprendedores sin asignar (si existe tabla mentor_emprendedor)
-        try:
-            cursor.execute(
-                """
-                SELECT u.id, u.username
-                FROM users u
-                JOIN roles r ON u.rol_id = r.id
-                WHERE r.nombre = 'Emprendedor'
-                  AND NOT EXISTS (
-                      SELECT 1 FROM mentor_emprendedor me WHERE me.emprendedor_id = u.id AND me.estado = 'activo'
-                  )
-                """
-            )
-            emprendedores_sin_asignar = cursor.fetchall() or []
-        except Exception:
-            emprendedores_sin_asignar = []
-
-        # Mentores con métricas resumidas
-        try:
-            cursor.execute(
-                """
-                SELECT u.id, u.username,
-                    (SELECT COUNT(*) FROM mentor_emprendedor me WHERE me.mentor_id = u.id AND me.estado = 'activo') AS total_emprendedores,
-                    (SELECT COUNT(*) FROM proyectos p WHERE p.user_id IN (SELECT emprendedor_id FROM mentor_emprendedor me2 WHERE me2.mentor_id = u.id AND me2.estado = 'activo')) AS total_proyectos,
-                    (SELECT COUNT(*) FROM sesiones s WHERE s.mentor_id = u.id AND s.estado = 'completada') AS sesiones_completadas,
-                    (SELECT COUNT(*) FROM contenido_mentor c WHERE c.mentor_id = u.id AND c.estado = 'aprobado') AS contenidos_aprobados
-                FROM users u
-                JOIN roles r ON u.rol_id = r.id
-                WHERE r.nombre = 'Mentor'
-                """
-            )
-            mentores_con_asignaciones = cursor.fetchall() or []
-        except Exception:
-            mentores_con_asignaciones = []
-
-        cursor.close()
-        connection.close()
-
-    except Exception as e:
-        print(f"Error cargando panel_coordinador: {e}")
-
-    return render_template('panel_coordinador.html',
-                           total_mentores=total_mentores,
-                           total_emprendedores=total_emprendedores,
-                           contenido_pendiente=contenido_pendiente,
-                           asignaciones_mes=asignaciones_mes,
-                           contenidos_pendientes=contenidos_pendientes,
-                           mentores=mentores,
-                           emprendedores_sin_asignar=emprendedores_sin_asignar,
-                           mentores_con_asignaciones=mentores_con_asignaciones)
 
 @app.route('/enviar_mensaje_mentor', methods=['POST'])
 def enviar_mensaje_mentor():

@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+{% block title %}Mi Mentor{% endblock %}
+
+{% block content %}
+<style>
+.mentor-profile-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.mentor-header {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.mentor-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.mentor-info h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.section-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.section-title i {
+    color: #8b5cf6;
+}
+
+.sesion-item {
+    padding: 1.2rem;
+    border-left: 4px solid #8b5cf6;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.sesion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sesion-tema {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-completed { background: #d1fae5; color: #065f46; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-canceled { background: #fee2e2; color: #991b1b; }
+
+.objetivo-card {
+    padding: 1.2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.objetivo-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.objetivo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.8rem;
+}
+
+.objetivo-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 1.05rem;
+}
+
+.contenido-card {
+    padding: 1.2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.contenido-card:hover {
+    border-color: #8b5cf6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.btn-solicitar {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.btn-solicitar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 600px;
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #8b5cf6;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.back-button:hover {
+    background: #f3f4f6;
+    transform: translateX(-5px);
+}
+
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="mentor-profile-container">
+    <a href="{{ url_for('panel_emprendedor') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+    </a>
+
+    <div class="mentor-header">
+        <div class="mentor-avatar-large">
+            {{ mentor.username[0]|upper }}
+        </div>
+        <div class="mentor-info">
+            <h1>{{ mentor.username }}</h1>
+            <p>Tu mentor desde {{ mentor.fecha_asignacion.strftime('%d de %B, %Y') if mentor.fecha_asignacion }}</p>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Columna principal -->
+        <div>
+            <!-- Historial de sesiones -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Historial de Sesiones
+                </h2>
+
+                {% if sesiones %}
+                    {% for sesion in sesiones %}
+                    <div class="sesion-item">
+                        <div class="sesion-header">
+                            <div class="sesion-tema">{{ sesion.tema }}</div>
+                            <span class="badge badge-{{ 'completed' if sesion.estado == 'completada' else 'pending' if sesion.estado == 'programada' else 'canceled' }}">
+                                {{ sesion.estado|capitalize }}
+                            </span>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0.3rem 0;">
+                            <i class="fas fa-calendar"></i> {{ sesion.fecha.strftime('%d/%m/%Y') }} a las {{ sesion.hora.strftime('%H:%M') if sesion.hora }}
+                        </p>
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0.3rem 0;">
+                            <i class="fas fa-video"></i> {{ sesion.modalidad|capitalize }}
+                        </p>
+                        {% if sesion.notas %}
+                        <p style="color: #374151; margin-top: 0.8rem; padding: 0.8rem; background: white; border-radius: 6px;">
+                            <strong>Notas:</strong> {{ sesion.notas }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    No hay sesiones registradas aún.
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Mis objetivos -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <i class="fas fa-bullseye"></i>
+                    Mis Objetivos
+                </h2>
+
+                {% if objetivos %}
+                    {% for objetivo in objetivos %}
+                    <div class="objetivo-card">
+                        <div class="objetivo-header">
+                            <div class="objetivo-title">{{ objetivo.titulo }}</div>
+                            <span class="badge {% if objetivo.estado == 'completado' %}badge-completed{% elif objetivo.estado == 'en_progreso' %}badge-pending{% else %}badge-canceled{% endif %}">
+                                {{ objetivo.estado|replace('_', ' ')|capitalize }}
+                            </span>
+                        </div>
+                        
+                        {% if objetivo.descripcion %}
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0.5rem 0;">
+                            {{ objetivo.descripcion }}
+                        </p>
+                        {% endif %}
+
+                        {% if objetivo.fecha_limite %}
+                        <p style="color: #6b7280; font-size: 0.85rem; margin-top: 0.8rem;">
+                            <i class="fas fa-flag-checkered"></i> Fecha límite: {{ objetivo.fecha_limite.strftime('%d/%m/%Y') }}
+                        </p>
+                        {% endif %}
+
+                        {% if objetivo.estado != 'completado' %}
+                        <form action="{{ url_for('emprendedor_marcar_objetivo', objetivo_id=objetivo.id) }}" method="POST" style="margin-top: 0.8rem;">
+                            <button type="submit" class="btn-solicitar" style="padding: 0.5rem;">
+                                <i class="fas fa-check"></i> Marcar como Completado
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    Tu mentor aún no te ha asignado objetivos.
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Contenido creado por el mentor -->
+            <div class="section-card">
+                <h2 class="section-title">
+                    <i class="fas fa-book"></i>
+                    Recursos de tu Mentor
+                </h2>
+
+                {% if contenido_mentor %}
+                    {% for contenido in contenido_mentor %}
+                    <div class="contenido-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <h3 style="margin: 0; font-size: 1.05rem; color: #1f2937;">{{ contenido.titulo }}</h3>
+                            <span style="padding: 0.3rem 0.7rem; background: #f3f4f6; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">
+                                {{ contenido.tipo|capitalize }}
+                            </span>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0.5rem 0;">
+                            {{ contenido.descripcion[:100] }}{% if contenido.descripcion|length > 100 %}...{% endif %}
+                        </p>
+                        <details style="margin-top: 1rem;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #8b5cf6;">Ver contenido completo</summary>
+                            <div style="margin-top: 1rem; padding: 1rem; background: #f9fafb; border-radius: 8px; white-space: pre-wrap;">
+                                {{ contenido.contenido }}
+                            </div>
+                        </details>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p style="text-align: center; color: #6b7280; padding: 2rem;">
+                    Tu mentor aún no ha creado recursos específicos.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <!-- Solicitar sesión -->
+            <div class="section-card">
+                <h3 class="section-title" style="font-size: 1.1rem;">
+                    <i class="fas fa-calendar-plus"></i>
+                    Solicitar Sesión
+                </h3>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">
+                    Solicita una sesión de mentoría con tu mentor para resolver dudas o recibir orientación.
+                </p>
+                <button onclick="openModal()" class="btn-solicitar">
+                    <i class="fas fa-paper-plane"></i> Solicitar Sesión
+                </button>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="section-card">
+                <h3 class="section-title" style="font-size: 1.1rem;">
+                    <i class="fas fa-info-circle"></i>
+                    Información
+                </h3>
+                <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; margin-bottom: 0.8rem;">
+                    <div style="font-size: 0.9rem; color: #374151; margin-bottom: 0.5rem;">
+                        <strong>Sesiones completadas:</strong> {{ sesiones|selectattr('estado', 'equalto', 'completada')|list|length }}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #374151; margin-bottom: 0.5rem;">
+                        <strong>Objetivos activos:</strong> {{ objetivos|rejectattr('estado', 'equalto', 'completado')|list|length }}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #374151;">
+                        <strong>Recursos disponibles:</strong> {{ contenido_mentor|length }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para solicitar sesión -->
+<div id="solicitudModal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin: 0 0 1.5rem 0;">Solicitar Sesión con {{ mentor.username }}</h2>
+        
+        <form action="{{ url_for('emprendedor_solicitar_sesion') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Tema de la sesión *</label>
+                <input type="text" name="tema" class="form-input" required
+                       placeholder="Ej: Validación de mi modelo de negocio">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mensaje adicional</label>
+                <textarea name="mensaje" class="form-textarea"
+                          placeholder="Describe brevemente qué te gustaría tratar en la sesión..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="button" onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 0.8rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-solicitar" style="flex: 2; margin: 0;">
+                    <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById('solicitudModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    document.getElementById('solicitudModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('solicitudModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+</script>
+
+<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+{% endblock %}
