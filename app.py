@@ -940,7 +940,7 @@ def actualizar_progreso_proyecto(project_id):
         return jsonify({'error': 'No autorizado'}), 401
         
     try:
-        progreso = int(request.json.get('progreso', 0))
+        progreso = int(request.json.get('progress', 0))
         if progreso < 0 or progreso > 100:
             return jsonify({'error': 'Progreso inválido'}), 400
 
@@ -2112,40 +2112,44 @@ def route_train_success_model():
 
 
 # --- ENDPOINT DE PREDICCIÓN DE ÉXITO ---
-@app.route('/predict_success/<int:proj_id>', methods=['GET'])
-def route_predict_success(proj_id):
-    """
-    Realiza la predicción del nivel de éxito de un proyecto específico del usuario logueado.
-    Requiere haber entrenado previamente el modelo.
-    """
+@app.route('/predict_success/<int:project_id>', methods=['GET'])
+def predict_success(project_id):
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'No autorizado'}), 401
 
-    user_id = session['user_id']
-
-    def get_project_by_id(pid, uid):
-        """Obtiene un proyecto guardado del usuario desde data/user_<id>.json."""
-        data = load_user_data(uid)
-        for p in data.get('projects', []):
-            if p.get('id') == pid:
-                return p
-        return None
-
-    project = get_project_by_id(proj_id, user_id)
-    if not project:
-        return jsonify({'success': False, 'error': 'Proyecto no encontrado'}), 404
-
     try:
-        res = predict_project({
-            'description': project.get('description', ''),
-            'progreso': project.get('progreso', 0),
-            'created_at': project.get('created_at', '')
-        })
-        return jsonify({'success': True, 'result': res})
-    except FileNotFoundError:
-        return jsonify({'success': False, 'error': 'Modelo no entrenado. Usa /train_success_model'}), 400
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        # Buscar el proyecto por ID y usuario
+        cursor.execute("""
+            SELECT id, title, description, progreso, created_at
+            FROM proyectos
+            WHERE id = %s AND user_id = %s
+        """, (project_id, session['user_id']))
+        project = cursor.fetchone()
+        connection.close()
+
+        if not project:
+            return jsonify({'success': False, 'error': 'Proyecto no encontrado'}), 404
+
+        # Crear diccionario compatible con el modelo
+        project_data = {
+            'description': project['description'] or '',
+            'progress': project['progreso'] or 0,
+            'created_at': project['created_at'].isoformat() if project['created_at'] else ''
+        }
+
+        # Importar función predict_project del modelo
+        from ml_model_multiclass import predict_project
+        result = predict_project(project_data)
+
+        return jsonify({'success': True, 'result': result})
+
     except Exception as e:
+        print(f"Error en predict_success: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 # --- RUTA VISUAL PARA ENTRENAR EL MODELO (desde el panel del admin) ---
 @app.route('/admin/train_model', methods=['GET'])
