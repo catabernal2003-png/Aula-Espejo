@@ -15,14 +15,12 @@ app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_aqui'
 
 # Configuración para XAMPP
-db_config = {
-    'host': '127.0.0.1',  # Cambiado de 'localhost' a '127.0.0.1'
+DB_CONFIG = {
+    'host': 'shortline.proxy.rlwy.net',
+    'port': 59135,
     'user': 'root',
-    'password': '',  
-    'database': 'startpnjr',
-    'port': 3306,
-    'raise_on_warnings': True,
-    'auth_plugin': 'mysql_native_password'  # Añadido para compatibilidad
+    'password': 'thFrJkBkQaQoPGGEHInZUmupLHFxCGLg',
+    'database': 'startpnjr'
 }
 
 def get_db_connection():
