@@ -26,19 +26,14 @@ DB_CONFIG = {
 
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='',  
-            database='startpnjr',
-            port=3306 
-        )
+        connection = mysql.connector.connect(**DB_CONFIG)
         if connection.is_connected():
-            print("Conexión exitosa a MySQL")
+            print("✅ Conexión exitosa a MySQL en Railway")
             return connection
     except Error as e:
-        print(f"Error detallado de conexión: {e}")
+        print(f"❌ Error detallado de conexión: {e}")
     return None
+
 
 def init_db():
     connection = get_db_connection()
