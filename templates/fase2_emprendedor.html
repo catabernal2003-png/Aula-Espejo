@@ -1,194 +1,1064 @@
 {% extends "base.html" %}
+{% block title %}Probador de Modelo ML{% endblock %}
 
 {% block content %}
-<div class="fase2-container">
-  <div class="header-fase2">
-    <h1>Fase 2 — Modelado y Validación</h1>
-    <p>En esta fase podrás entrenar tu modelo y validar los resultados de tus proyectos.</p>
-  </div>
-
-  <div class="actions-header">
-    <a href="{{ url_for('panel_emprendedor') }}" class="btn-volver">← Volver al panel principal</a>
-  </div>
-
-  <div class="grid-cards">
-    <!-- Tarjeta 1 -->
-    <div class="card-fase2">
-      <div class="card-header">
-        <i class="fas fa-brain icon"></i>
-        <h4>Entrenamiento del Modelo</h4>
-      </div>
-      <p>Entrena el modelo de predicción con los datos actuales del sistema.</p>
-      <form method="post" action="{{ url_for('route_train_success_model') }}">
-        <button type="submit" class="btn-primary">Entrenar Modelo</button>
-      </form>
-    </div>
-
-    <!-- Tarjeta 2 -->
-    <div class="card-fase2">
-      <div class="card-header">
-        <i class="fas fa-chart-line icon"></i>
-        <h4>Validación de Resultados</h4>
-      </div>
-      <p>Selecciona un proyecto para analizar y ver su nivel de éxito según el modelo.</p>
-      <form method="get" action="{{ url_for('route_predict_success', proj_id=1) }}">
-        <button type="submit" class="btn-primary">Validar Proyecto</button>
-      </form>
-    </div>
-
-    <!-- Tarjeta 3 -->
-    <div class="card-fase2">
-      <div class="card-header">
-        <i class="fas fa-database icon"></i>
-        <h4>Datos del Proyecto</h4>
-      </div>
-      <p>Consulta la información recopilada de tus proyectos registrados en el sistema.</p>
-      <a href="{{ url_for('ver_proyectos_emprendedor') }}" class="btn-primary">Ver Proyectos</a>
-    </div>
-
-    <!-- Tarjeta 4 -->
-    <div class="card-fase2">
-      <div class="card-header">
-        <i class="fas fa-bolt icon"></i>
-        <h4>Rendimiento del Modelo</h4>
-      </div>
-      <p>Revisa métricas y precisión del modelo entrenado.</p>
-      <button class="btn-primary">Ver Rendimiento</button>
-    </div>
-  </div>
-
-  {% if result %}
-  <div class="result-card">
-    <h4>Resultado del modelo:</h4>
-    <pre>{{ result | tojson(indent=2) }}</pre>
-  </div>
-  {% endif %}
-</div>
-
 <style>
-  body {
-    background: linear-gradient(135deg, #6c63ff 0%, #726bff 40%, #8b83ff 100%);
-    font-family: 'Poppins', sans-serif;
-  }
+:root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
 
-  .fase2-container {
-    padding: 40px 80px;
-  }
+.probador-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
 
-  .header-fase2 {
+.hero-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 20px;
+    padding: 3rem;
     color: white;
-    margin-bottom: 30px;
-  }
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+}
 
-  .header-fase2 h1 {
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-
-  .header-fase2 p {
-    font-size: 15px;
-    color: #e8e8ff;
-  }
-
-  .actions-header {
-    margin-bottom: 40px;
-  }
-
-  .btn-volver {
-    background-color: white;
-    color: #6c63ff;
-    padding: 10px 25px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    transition: all 0.3s;
-  }
-
-  .btn-volver:hover {
-    background-color: #f0f0ff;
-    color: #5848f8;
-  }
-
-  .grid-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-  }
-
-  .card-fase2 {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    padding: 25px;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-
-  .card-fase2:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-  }
-
-  .card-header {
+.hero-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-  }
+    gap: 1rem;
+}
 
-  .card-header h4 {
-    font-weight: 600;
-    margin: 0;
-    color: #333;
-  }
-
-  .icon {
-    background: linear-gradient(145deg, #6c63ff, #8b83ff);
-    color: white;
-    border-radius: 50%;
-    padding: 12px;
-    margin-right: 12px;
-    font-size: 1.4rem;
-  }
-
-  .btn-primary {
-    background: #6c63ff;
-    border: none;
-    color: white;
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-weight: 500;
-    transition: 0.3s;
-  }
-
-  .btn-primary:hover {
-    background: #554df1;
-    transform: scale(1.03);
-  }
-
-  .result-card {
+.tabs-container {
     background: white;
-    margin-top: 50px;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  }
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
 
-  .result-card pre {
-    background: #f8f9fa;
-    padding: 15px;
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.tab {
+    flex: 1;
+    padding: 1.2rem;
+    background: none;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab:hover {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.tab.active {
+    color: var(--primary);
+    border-bottom: 3px solid var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.tab-content {
+    display: none;
+    padding: 2rem;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.info-card {
+    border-left: 4px solid;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.info-card.blue { background: #eff6ff; border-color: #3b82f6; }
+.info-card.green { background: #f0fdf4; border-color: #10b981; }
+.info-card.purple { background: #faf5ff; border-color: #8b5cf6; }
+.info-card.yellow { background: #fffbeb; border-color: #f59e0b; }
+
+.info-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.test-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #e5e7eb;
     border-radius: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
 
-  @media (max-width: 768px) {
-    .fase2-container {
-      padding: 30px 20px;
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.range-input {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #e5e7eb;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.btn-analyze {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-analyze:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.btn-analyze:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.result-container {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 400px;
+}
+
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    border: 2px solid;
+}
+
+.result-badge.success { background: #d1fae5; color: #065f46; border-color: #10b981; }
+.result-badge.warning { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+.result-badge.danger { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
+
+.confidence-meter {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.confidence-bar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.confidence-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
+}
+
+.prob-bar {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0.3rem 0;
+}
+
+.prob-fill {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.prob-fill.success { background: var(--success); }
+.prob-fill.warning { background: var(--warning); }
+.prob-fill.danger { background: var(--danger); }
+
+.features-analysis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.feature-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+}
+
+.feature-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.5rem 0;
+}
+
+.explanation-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+.scenario-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.scenario-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-5px);
+}
+
+.upload-area {
+    border: 3px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #f9fafb;
+}
+
+.upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: var(--primary);
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.back-button:hover {
+    background: #f3f4f6;
+    transform: translateX(-5px);
+}
+
+@media (max-width: 1024px) {
+    .test-grid {
+        grid-template-columns: 1fr;
     }
-  }
+}
 </style>
 
-<script src="https://kit.fontawesome.com/a2d2a4a6a0.js" crossorigin="anonymous"></script>
+<div class="probador-container">
+    <a href="{{ url_for('panel_emprendedor') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+    </a>
+
+    <div class="hero-header">
+        <h1>
+            <i class="fas fa-brain"></i>
+            Probador de Modelo ML
+        </h1>
+        <p>Aprende cómo funciona la predicción de éxito de proyectos empresariales</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('guide')">
+                <i class="fas fa-info-circle"></i>
+                Guía de Uso
+            </button>
+            <button class="tab" onclick="switchTab('train')">
+                <i class="fas fa-upload"></i>
+                Entrenar Modelo
+            </button>
+            <button class="tab" onclick="switchTab('test')">
+                <i class="fas fa-flask"></i>
+                Probar Modelo
+            </button>
+            <button class="tab" onclick="switchTab('scenarios')">
+                <i class="fas fa-list-check"></i>
+                Casos de Prueba
+            </button>
+        </div>
+
+        <!-- TAB: Guía -->
+        <div id="guide-tab" class="tab-content active">
+            <div class="info-card blue">
+                <h3><i class="fas fa-graduation-cap"></i> ¿Cómo funciona el modelo?</h3>
+                <p style="line-height: 1.8; color: #374151;">
+                    Este modelo de Machine Learning analiza la descripción, progreso y antigüedad de un proyecto
+                    para predecir su nivel de éxito potencial. Utiliza <strong>Random Forest</strong> (200 árboles de decisión)
+                    para categorizar proyectos en: <strong>Bajo éxito</strong>, <strong>Medio éxito</strong> o <strong>Alto éxito</strong>.
+                </p>
+            </div>
+
+            <div class="info-card green">
+                <h3><i class="fas fa-check-circle"></i> Qué evalúa el modelo</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: white; padding: 1rem; border-radius: 8px;">
+                        <strong style="color: var(--success);">Descripción</strong>
+                        <p style="margin: 0.5rem 0 0; color: #6b7280; font-size: 0.9rem;">
+                            Palabras clave como "clientes activos", "ingresos recurrentes", "MRR", "usuarios"
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 8px;">
+                        <strong style="color: var(--success);">Progreso</strong>
+                        <p style="margin: 0.5rem 0 0; color: #6b7280; font-size: 0.9rem;">
+                            Porcentaje de avance (ponderación no-lineal)
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 8px;">
+                        <strong style="color: var(--success);">Antigüedad</strong>
+                        <p style="margin: 0.5rem 0 0; color: #6b7280; font-size: 0.9rem;">
+                            Días transcurridos (proyectos maduros vs nuevos)
+                        </p>
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 8px;">
+                        <strong style="color: var(--success);">Métricas</strong>
+                        <p style="margin: 0.5rem 0 0; color: #6b7280; font-size: 0.9rem;">
+                            Números, porcentajes, símbolos monetarios
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card purple">
+                <h3><i class="fas fa-key"></i> Palabras Clave por Categoría</h3>
+                
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--success);">Alto Éxito:</strong>
+                    <p style="margin: 0.5rem 0; color: #374151;">clientes activos, ingresos recurrentes, usuarios, MRR, funding, inversión, crecimiento, empleados, escalamiento, validado</p>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--warning);">Medio Éxito:</strong>
+                    <p style="margin: 0.5rem 0; color: #374151;">prototipo, MVP, desarrollo, testing, beta, modelo de negocio, pitch, equipo formado, primeros clientes, feedback</p>
+                </div>
+                
+                <div>
+                    <strong style="color: var(--danger);">Bajo Éxito:</strong>
+                    <p style="margin: 0.5rem 0; color: #374151;">idea, concepto, inicial, exploración, investigación, sin validación, fase inicial, brainstorming</p>
+                </div>
+            </div>
+
+            <div class="info-card yellow">
+                <h3><i class="fas fa-lightbulb"></i> Tips para Mejores Resultados</h3>
+                <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8; color: #374151;">
+                    <li>✅ <strong>Alto éxito:</strong> Menciona métricas concretas ($50K MRR, 500 usuarios, 20 empleados), progreso 85%+</li>
+                    <li>✅ <strong>Medio éxito:</strong> Incluye "prototipo funcional", "equipo formado", "primeros clientes", progreso 50-70%</li>
+                    <li>✅ <strong>Bajo éxito:</strong> Usa "idea inicial", "fase exploratoria", "sin validación", progreso 0-30%</li>
+                    <li>🔢 <strong>Usa números:</strong> El modelo detecta cifras, porcentajes y símbolos monetarios</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TAB: Entrenar -->
+        <div id="train-tab" class="tab-content">
+            <div class="info-card blue" style="margin-bottom: 2rem;">
+                <h3><i class="fas fa-info-circle"></i> Antes de Entrenar</h3>
+                <p style="margin: 0; line-height: 1.7; color: #374151;">
+                    El modelo necesita datos de entrenamiento en formato CSV. Puedes descargar un dataset optimizado
+                    con 45 ejemplos balanceados, o usar tus propios datos siguiendo la misma estructura.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <div class="form-section">
+                    <h3 style="margin: 0 0 1rem 0; color: #1f2937;">
+                        <i class="fas fa-download"></i> Paso 1: Descargar Ejemplo
+                    </h3>
+                    <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                        Dataset optimizado con 45 ejemplos bien diferenciados
+                    </p>
+                    <a href="{{ url_for('emprendedor_descargar_dataset_ml_ejemplo') }}"  
+                       class="btn-analyze" style="text-decoration: none; display: block; text-align: center;">
+                        <i class="fas fa-download"></i> Descargar Dataset Optimizado
+                    </a>
+                    
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                        <strong style="color: #374151;">Formato requerido:</strong>
+                        <code style="display: block; margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; font-size: 0.85rem;">
+                            description,progress,created_at,outcome
+                        </code>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 style="margin: 0 0 1rem 0; color: #1f2937;">
+                        <i class="fas fa-upload"></i> Paso 2: Subir tu Dataset
+                    </h3>
+                    <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                        Arrastra o selecciona tu archivo CSV
+                    </p>
+                    
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                            <p style="margin: 0 0 0.5rem; font-weight: 600; color: #374151;">Arrastra tu CSV aquí</p>
+                            <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">o haz clic para seleccionar</p>
+                            <input type="file" id="fileInput" name="dataset" accept=".csv" style="display: none;">
+                        </div>
+                        
+                        <div id="fileName" style="margin-top: 1rem; font-weight: 600; color: var(--primary); display: none;"></div>
+                        
+                        <button type="submit" id="trainBtn" class="btn-analyze" style="margin-top: 1rem;" disabled>
+                            <i class="fas fa-brain"></i> <span id="trainBtnText">Entrenar Modelo</span>
+                        </button>
+                    </form>
+                    
+                    <div id="trainResult" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 style="margin: 0 0 1rem 0; color: #1f2937;">
+                    <i class="fas fa-sync-alt"></i> Opción Rápida: Reentrenar con Dataset Optimizado
+                </h3>
+                <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                    Si el modelo no predice correctamente, reentrénal o automáticamente con 45 ejemplos optimizados.
+                </p>
+                <button type="button" id="retrainBtn" class="btn-analyze" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-sync-alt"></i> Reentrenar Modelo Mejorado
+                </button>
+                <div id="retrainResult" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- TAB: Probar -->
+        <div id="test-tab" class="tab-content">
+            <form id="testForm" class="test-grid">
+                <div class="form-section">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">
+                        <i class="fas fa-edit"></i> Datos del Proyecto
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Descripción del Proyecto *</label>
+                        <textarea 
+                            id="description" 
+                            class="form-textarea" 
+                            placeholder="Ej: Prototipo funcional con 50 clientes activos generando $20K MRR..."
+                            required
+                        ></textarea>
+                        <small style="color: #6b7280;">Incluye métricas concretas y palabras clave</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Progreso: <span id="progressValue">50</span>%</label>
+                        <input 
+                            type="range" 
+                            id="progress" 
+                            class="range-input"
+                            min="0" 
+                            max="100" 
+                            value="50"
+                            oninput="document.getElementById('progressValue').textContent = this.value"
+                        >
+                        <div class="range-labels">
+                            <span>0%</span>
+                            <span>50%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Creación</label>
+                        <input 
+                            type="date" 
+                            id="created_at" 
+                            class="form-input"
+                            value="{{ today }}"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-analyze" id="analyzeBtn">
+                        <i class="fas fa-brain"></i>
+                        <span id="btnText">Analizar Proyecto</span>
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3 style="margin-bottom: 1.5rem; color: #1f2937;">
+                        <i class="fas fa-chart-bar"></i> Resultado del Análisis
+                    </h3>
+                    
+                    <div id="resultContainer" class="result-container">
+                        <div style="text-align: center; color: #6b7280; padding: 3rem 0;">
+                            <i class="fas fa-brain" style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                            <p style="margin: 0;">Completa los datos y presiona Analizar</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB: Casos de prueba -->
+        <div id="scenarios-tab" class="tab-content">
+            <div class="scenario-card" onclick="loadScenario(0)">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <h4 style="margin: 0; color: #1f2937;">Proyecto de Alto Éxito</h4>
+                    <span style="background: var(--success); color: white; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">Alto</span>
+                </div>
+                <p style="color: #6b7280; margin: 0 0 1rem 0;">500 clientes activos generando $50K MRR con crecimiento del 25% mensual. Equipo de 12 personas establecido y expansión a nuevas ciudades.</p>
+                <div style="display: flex; gap: 2rem; font-size: 0.9rem;">
+                    <span><strong>Progreso:</strong> 92%</span>
+                    <span><strong>Antigüedad:</strong> ~4 meses</span>
+                </div>
+            </div>
+
+            <div class="scenario-card" onclick="loadScenario(1)">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <h4 style="margin: 0; color: #1f2937;">Proyecto de Medio Éxito</h4>
+                    <span style="background: var(--warning); color: white; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">Medio</span>
+                </div>
+                <p style="color: #6b7280; margin: 0 0 1rem 0;">Prototipo funcional con 20 usuarios de prueba y feedback positivo. Equipo de 3 personas desarrollando MVP y buscando financiamiento.</p>
+                <div style="display: flex; gap: 2rem; font-size: 0.9rem;">
+                    <span><strong>Progreso:</strong> 55%</span>
+                    <span><strong>Antigüedad:</strong> ~2 meses</span>
+                </div>
+            </div>
+
+            <div class="scenario-card" onclick="loadScenario(2)">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <h4 style="margin: 0; color: #1f2937;">Proyecto de Bajo Éxito</h4>
+                    <span style="background: var(--danger); color: white; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">Bajo</span>
+                </div>
+                <p style="color: #6b7280; margin: 0 0 1rem 0;">Idea inicial en fase de investigación de mercado. Sin prototipo ni validación con clientes. Explorando modelo de negocio básico.</p>
+                <div style="display: flex; gap: 2rem; font-size: 0.9rem;">
+                    <span><strong>Progreso:</strong> 8%</span>
+                    <span><strong>Antigüedad:</strong> ~2 semanas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Calcular fechas directamente en JavaScript
+function getDateString(daysAgo) {
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    return date.toISOString().split('T')[0];
+}
+
+// Casos de prueba mejorados
+const scenarios = [
+    {
+        description: "500 clientes activos generando $50K MRR con crecimiento del 25% mensual. Equipo de 12 personas establecido con roles definidos. Expansión a 3 nuevas ciudades en proceso. Validación de mercado completada con métricas positivas de retención del 85%.",
+        progress: 92,
+        created_at: getDateString(120)
+    },
+    {
+        description: "Prototipo funcional con 20 usuarios de prueba y feedback positivo. Equipo de 3 personas desarrollando MVP. Buscando financiamiento inicial de $100K para acelerar desarrollo. Modelo de negocio definido con primeros clientes piloto.",
+        progress: 55,
+        created_at: getDateString(60)
+    },
+    {
+        description: "Idea inicial en fase de investigación de mercado. Sin prototipo ni validación con clientes reales. Explorando modelo de negocio básico y competencia. Fase muy temprana sin equipo formado.",
+        progress: 8,
+        created_at: getDateString(15)
+    }
+];
+
+// Sistema de pestañas
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+        document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.getElementById(tabName + '-tab').classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+// Cargar caso de prueba
+function loadScenario(index) {
+    const scenario = scenarios[index];
+    document.getElementById('description').value = scenario.description;
+    document.getElementById('progress').value = scenario.progress;
+    document.getElementById('progressValue').textContent = scenario.progress;
+    document.getElementById('created_at').value = scenario.created_at;
+    
+    // Cambiar a pestaña de prueba
+    switchTab('test');
+}
+
+// Sistema de subida de archivos
+document.getElementById('uploadArea').addEventListener('click', function() {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+        const fileName = e.target.files[0].name;
+        document.getElementById('fileName').textContent = `Archivo seleccionado: ${fileName}`;
+        document.getElementById('fileName').style.display = 'block';
+        document.getElementById('trainBtn').disabled = false;
+    }
+});
+
+// Arrastrar y soltar
+document.getElementById('uploadArea').addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+document.getElementById('uploadArea').addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+document.getElementById('uploadArea').addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+        document.getElementById('fileInput').files = files;
+        document.getElementById('fileName').textContent = `Archivo seleccionado: ${files[0].name}`;
+        document.getElementById('fileName').style.display = 'block';
+        document.getElementById('trainBtn').disabled = false;
+    }
+});
+
+// Entrenar modelo
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const trainBtn = document.getElementById('trainBtn');
+    const trainBtnText = document.getElementById('trainBtnText');
+    
+    trainBtn.disabled = true;
+    trainBtnText.textContent = 'Entrenando...';
+    
+    try {
+        console.log('Enviando solicitud de entrenamiento...');
+        const response = await fetch('/emprendedor/entrenar_modelo_ml', {
+            method: 'POST',
+            body: formData
+        });
+        
+        console.log('Respuesta recibida:', response.status);
+        const result = await response.json();
+        console.log('Resultado:', result);
+        
+        if (result.success) {
+            document.getElementById('trainResult').innerHTML = `
+                <div style="background: #d1fae5; color: #065f46; padding: 1rem; border-radius: 8px; border: 2px solid #10b981;">
+                    <i class="fas fa-check-circle"></i> <strong>¡Éxito!</strong> ${result.message}
+                </div>
+            `;
+        } else {
+            document.getElementById('trainResult').innerHTML = `
+                <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; border: 2px solid #ef4444;">
+                    <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ${result.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error en entrenamiento:', error);
+        document.getElementById('trainResult').innerHTML = `
+            <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; border: 2px solid #ef4444;">
+                <i class="fas fa-exclamation-circle"></i> <strong>Error de conexión:</strong> No se pudo conectar con el servidor
+            </div>
+        `;
+    } finally {
+        trainBtn.disabled = false;
+        trainBtnText.textContent = 'Entrenar Modelo';
+    }
+});
+
+// Reentrenar modelo
+document.getElementById('retrainBtn').addEventListener('click', async function() {
+    const retrainBtn = document.getElementById('retrainBtn');
+    const retrainResult = document.getElementById('retrainResult');
+    
+    retrainBtn.disabled = true;
+    retrainBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Reentrenando...';
+    
+    try {
+        console.log('Reentrenando modelo...');
+        const response = await fetch('/emprendedor/reentrenar_modelo', {
+            method: 'GET'
+        });
+        
+        console.log('Respuesta de reentrenamiento:', response.status);
+        const result = await response.json();
+        console.log('Resultado:', result);
+        
+        if (result.success) {
+            retrainResult.innerHTML = `
+                <div style="background: #d1fae5; color: #065f46; padding: 1rem; border-radius: 8px; border: 2px solid #10b981;">
+                    <i class="fas fa-check-circle"></i> <strong>¡Éxito!</strong> ${result.message}
+                </div>
+            `;
+        } else {
+            retrainResult.innerHTML = `
+                <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; border: 2px solid #ef4444;">
+                    <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ${result.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error en reentrenamiento:', error);
+        retrainResult.innerHTML = `
+            <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; border: 2px solid #ef4444;">
+                <i class="fas fa-exclamation-circle"></i> <strong>Error de conexión:</strong> No se pudo conectar con el servidor
+            </div>
+        `;
+    } finally {
+        retrainBtn.disabled = false;
+        retrainBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Reentrenar Modelo Mejorado';
+    }
+});
+
+// Probar modelo
+document.getElementById('testForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const btnText = document.getElementById('btnText');
+    const resultContainer = document.getElementById('resultContainer');
+    
+    analyzeBtn.disabled = true;
+    btnText.textContent = 'Analizando...';
+    
+    const formData = {
+        description: document.getElementById('description').value,
+        progress: parseInt(document.getElementById('progress').value),
+        created_at: document.getElementById('created_at').value
+    };
+    
+    // Validar datos
+    if (!formData.description.trim()) {
+        alert('Por favor ingresa una descripción del proyecto');
+        analyzeBtn.disabled = false;
+        btnText.textContent = 'Analizar Proyecto';
+        return;
+    }
+    
+    try {
+        console.log('Enviando datos para predicción:', formData);
+        const response = await fetch('/api/predict_ml_test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        console.log('Respuesta HTTP:', response.status, response.statusText);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Resultado de predicción:', result);
+        
+        if (result.success) {
+            displayPredictionResult(result.result);
+        } else {
+            resultContainer.innerHTML = `
+                <div style="background: #fee2e2; color: #991b1b; padding: 1.5rem; border-radius: 8px; border: 2px solid #ef4444; text-align: center;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <h4 style="margin: 0 0 0.5rem; color: #991b1b;">Error en el análisis</h4>
+                    <p style="margin: 0;">${result.error || 'Error desconocido'}</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error en predicción:', error);
+        resultContainer.innerHTML = `
+            <div style="background: #fee2e2; color: #991b1b; padding: 1.5rem; border-radius: 8px; border: 2px solid #ef4444; text-align: center;">
+                <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h4 style="margin: 0 0 0.5rem; color: #991b1b;">Error de conexión</h4>
+                <p style="margin: 0;">No se pudo conectar con el servidor: ${error.message}</p>
+            </div>
+        `;
+    } finally {
+        analyzeBtn.disabled = false;
+        btnText.textContent = 'Analizar Proyecto';
+    }
+});
+
+// Mostrar resultado de predicción
+function displayPredictionResult(result) {
+    const resultContainer = document.getElementById('resultContainer');
+    const prediction = result.prediction || result.label;
+    const probabilities = result.probabilities || result.probs;
+    
+    console.log('Resultado completo:', result);
+    console.log('Predicción:', prediction);
+    console.log('Probabilidades:', probabilities);
+    
+    let badgeClass, badgeIcon, badgeText;
+    
+    // Manejar tanto versiones con acento como sin acento
+    switch(prediction) {
+        case 'Alto éxito':
+        case 'Alto exito':
+            badgeClass = 'success';
+            badgeIcon = 'fas fa-rocket';
+            badgeText = 'Alto Éxito';
+            break;
+        case 'Medio éxito':
+        case 'Medio exito':
+            badgeClass = 'warning';
+            badgeIcon = 'fas fa-chart-line';
+            badgeText = 'Medio Éxito';
+            break;
+        case 'Bajo éxito':
+        case 'Bajo exito':
+            badgeClass = 'danger';
+            badgeIcon = 'fas fa-seedling';
+            badgeText = 'Bajo Éxito';
+            break;
+        default:
+            badgeClass = 'warning';
+            badgeIcon = 'fas fa-question-circle';
+            badgeText = '❓ ' + prediction;
+    }
+    
+    // Crear HTML para las probabilidades
+    let probabilitiesHTML = '';
+    if (probabilities && Object.keys(probabilities).length > 0) {
+        probabilitiesHTML = Object.entries(probabilities).map(([category, prob]) => {
+            let barClass = '';
+            // Manejar ambas versiones (con y sin acento)
+            if (category === 'Alto éxito' || category === 'Alto exito') barClass = 'success';
+            else if (category === 'Medio éxito' || category === 'Medio exito') barClass = 'warning';
+            else if (category === 'Bajo éxito' || category === 'Bajo exito') barClass = 'danger';
+            
+            const percentage = (prob * 100).toFixed(1);
+            
+            // Mostrar nombre bonito (con acento) independientemente de lo que venga del modelo
+            let displayCategory = category;
+            if (category === 'Alto exito') displayCategory = 'Alto éxito';
+            else if (category === 'Medio exito') displayCategory = 'Medio éxito';
+            else if (category === 'Bajo exito') displayCategory = 'Bajo éxito';
+            
+            return `
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 600; color: #374151;">${displayCategory}</span>
+                        <span style="font-weight: 600; color: #6b7280;">${percentage}%</span>
+                    </div>
+                    <div class="prob-bar">
+                        <div class="prob-fill ${barClass}" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        probabilitiesHTML = '<p style="color: #6b7280; text-align: center;">No se pudieron calcular probabilidades</p>';
+    }
+    
+    // Calcular confianza general
+    const maxProb = probabilities ? Math.max(...Object.values(probabilities)) : 0;
+    const confidencePercent = (maxProb * 100).toFixed(0);
+    
+    // Mostrar análisis de características si está disponible
+    let featuresHTML = '';
+    if (result.numeric_importance && result.numeric_importance.length > 0) {
+        featuresHTML = `
+            <div class="features-analysis">
+                ${result.numeric_importance.slice(0, 4).map(([feature, importance]) => `
+                    <div class="feature-card">
+                        <div style="font-size: 0.8rem; color: #6b7280;">${feature}</div>
+                        <div class="feature-value">${(importance * 100).toFixed(1)}%</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Explicación del resultado
+    let explanationHTML = '';
+    if (prediction.includes('Alto')) {
+        explanationHTML = 'El proyecto muestra características sólidas de tracción: métricas de crecimiento, base de clientes establecida y modelo de negocio validado.';
+    } else if (prediction.includes('Medio')) {
+        explanationHTML = 'El proyecto está en fase de desarrollo activo con validación inicial positiva. Necesita más tracción para alcanzar el siguiente nivel.';
+    } else {
+        explanationHTML = 'El proyecto se encuentra en fase inicial. Se recomienda enfocarse en validación del mercado y desarrollo del MVP.';
+    }
+    
+    resultContainer.innerHTML = `
+        <div class="result-badge ${badgeClass}">
+            <i class="${badgeIcon}"></i>
+            ${badgeText}
+        </div>
+        
+        <div class="confidence-meter">
+            <div style="display: flex; justify-content: between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600; color: #374151;">Confianza del modelo</span>
+                <span style="font-weight: 600; color: #6b7280;">${confidencePercent}%</span>
+            </div>
+            <div class="confidence-bar">
+                <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+            </div>
+        </div>
+        
+        <h4 style="margin-bottom: 1rem; color: #374151;">Probabilidades por Categoría:</h4>
+        ${probabilitiesHTML}
+        
+        ${featuresHTML}
+        
+        <div class="explanation-box">
+            <h5 style="margin: 0 0 0.5rem; color: #374151;">
+                <i class="fas fa-analytics"></i> Análisis del Proyecto
+            </h5>
+            <p style="margin: 0; color: #6b7280; line-height: 1.6;">
+                ${explanationHTML}
+            </p>
+        </div>
+        
+        <div style="margin-top: 2rem; padding: 1.5rem; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
+            <h5 style="margin: 0 0 0.5rem; color: #374151;">
+                <i class="fas fa-lightbulb"></i> Recomendaciones
+            </h5>
+            <p style="margin: 0; color: #6b7280; line-height: 1.6;">
+                ${getRecommendations(prediction)}
+            </p>
+        </div>
+    `;
+}
+
+// Obtener recomendaciones según predicción
+function getRecommendations(prediction) {
+    const recommendations = {
+        'Alto éxito': '¡Excelente! Enfócate en escalar operaciones, optimizar procesos y expandir a nuevos mercados. Considera estrategias de crecimiento agresivo y posible expansión internacional.',
+        'Medio exito': 'Buen progreso. Prioriza la validación del modelo de negocio, establece métricas clave y busca financiamiento para acelerar el crecimiento. Enfócate en convertir usuarios en clientes pagantes.',
+        'Bajo éxito': 'Es un buen comienzo. Te recomendamos enfocarte en validar la idea con clientes potenciales, desarrollar un prototipo mínimo viable y formar un equipo complementario.',
+
+    };
+    
+    return recommendations[prediction] || 'Continúa trabajando en tu proyecto y monitorea el progreso regularmente. Considera pivotar si no ves tracción después de varios meses.';
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Probador ML inicializado correctamente');
+    
+    // Establecer fecha actual por defecto en el formulario
+    const today = getDateString(0);
+    document.getElementById('created_at').value = today;
+});
+</script>
 {% endblock %}
-
-

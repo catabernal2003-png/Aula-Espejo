@@ -959,6 +959,146 @@ def actualizar_progreso_proyecto(project_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Agregar estas rutas después de las rutas existentes de emprendedor
+
+@app.route('/emprendedor/probador_modelo')
+def emprendedor_probador_modelo():
+    """Probador educativo del modelo ML para emprendedores"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    # Calcular fechas para casos de prueba
+    import datetime
+    today = datetime.date.today()
+    three_months_ago = (today - datetime.timedelta(days=90)).isoformat()
+    two_months_ago = (today - datetime.timedelta(days=60)).isoformat()
+    
+    return render_template('fase2_emprendedor.html',
+        today=today.isoformat(),
+        three_months_ago=three_months_ago,
+        two_months_ago=two_months_ago
+    )
+
+
+@app.route('/api/predict_test', methods=['POST'])
+def api_predict_test():
+    """API para probar el modelo con datos personalizados"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        data = request.json
+        description = data.get('description', '')
+        progress = int(data.get('progress', 0))
+        created_at = data.get('created_at', '')
+        
+        if not description:
+            return jsonify({'success': False, 'error': 'Descripción requerida'}), 400
+        
+        # Crear proyecto temporal para predicción
+        project_data = {
+            'description': description,
+            'progress': progress,
+            'created_at': created_at
+        }
+        
+        # Usar la función de predicción existente
+        from ml_model_multiclass import predict_project
+        result = predict_project(project_data)
+        
+        return jsonify({'success': True, 'result': result})
+        
+    except FileNotFoundError:
+        return jsonify({
+            'success': False, 
+            'error': 'Modelo no encontrado. Debes entrenar el modelo primero cargando un dataset.'
+        }), 400
+    except Exception as e:
+        print(f"Error en api_predict_test: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/emprendedor/entrenar_modelo', methods=['POST'])
+def emprendedor_entrenar_modelo():
+    """Permite al emprendedor entrenar el modelo con su propio CSV"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        # Verificar que se haya subido un archivo
+        if 'dataset' not in request.files:
+            return jsonify({'success': False, 'error': 'No se proporcionó archivo'}), 400
+        
+        file = request.files['dataset']
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No se seleccionó archivo'}), 400
+        
+        if not file.filename.endswith('.csv'):
+            return jsonify({'success': False, 'error': 'El archivo debe ser CSV'}), 400
+        
+        # Guardar temporalmente el archivo
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix='.csv', delete=False) as tmp:
+            file.save(tmp.name)
+            tmp_path = tmp.name
+        
+        try:
+            # Entrenar el modelo
+            from ml_model_multiclass import train_model
+            model_path = train_model(tmp_path)
+            
+            # Registrar actividad
+            registrar_actividad(session['user_id'], "Entrenó el modelo ML con dataset personalizado")
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Modelo entrenado exitosamente',
+                'model_path': model_path
+            })
+        finally:
+            # Limpiar archivo temporal
+            import os
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+                
+    except Exception as e:
+        print(f"Error en emprendedor_entrenar_modelo: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/emprendedor/descargar_dataset_ejemplo')
+def emprendedor_descargar_dataset_ejemplo():
+    """Descarga un dataset de ejemplo para entrenar"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    # Crear CSV de ejemplo en memoria
+    import io
+    output = io.StringIO()
+    output.write('description,progress,created_at,outcome\n')
+    output.write('"Emprendimiento de venta de dulces artesanales con enfoque en clientes jóvenes",25,2025-10-01,Bajo éxito\n')
+    output.write('"Aplicación móvil para conectar pequeños productores con clientes locales",60,2025-09-15,Medio éxito\n')
+    output.write('"Plataforma de inversión para startups de tecnología",85,2025-08-01,Alto éxito\n')
+    output.write('"Tienda online de ropa reciclada con enfoque ecológico",55,2025-09-20,Medio éxito\n')
+    output.write('"Proyecto de energía solar para zonas rurales",90,2025-07-10,Alto éxito\n')
+    output.write('"Emprendimiento sin descripción ni avance",5,2025-10-30,Bajo éxito\n')
+    output.write('"Desarrollo de prototipo para sistema de riego inteligente",70,2025-09-05,Medio éxito\n')
+    output.write('"Servicio de consultoría para emprendedores",80,2025-08-15,Alto éxito\n')
+    
+    # Convertir a bytes
+    output.seek(0)
+    
+    registrar_actividad(session['user_id'], "Descargó dataset de ejemplo")
+    
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=dataset_ejemplo.csv'}
+    )
+
 @app.route('/programa-incubacion')
 def programa_incubacion():
     if 'user_id' not in session:
@@ -2151,6 +2291,217 @@ def predict_success(project_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# Agregar estas rutas después de las rutas existentes de emprendedor
+
+@app.route('/emprendedor/probador_ml')
+def emprendedor_probador_ml():
+    """Probador educativo del modelo ML para emprendedores"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    # Calcular fechas para casos de prueba
+    import datetime
+    today = datetime.date.today()
+    three_months_ago = today - datetime.timedelta(days=90)
+    two_months_ago = today - datetime.timedelta(days=60)
+    
+    return render_template('fase2_emprendedor.html',
+        today=today.isoformat(),
+        three_months_ago=three_months_ago.isoformat(),
+        two_months_ago=two_months_ago.isoformat()
+    )
+
+
+@app.route('/api/predict_ml_test', methods=['POST'])
+def api_predict_ml_test():
+    """API para probar el modelo con datos personalizados"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        data = request.json
+        description = data.get('description', '')
+        progress = int(data.get('progress', 0))
+        created_at = data.get('created_at', '')
+        
+        if not description:
+            return jsonify({'success': False, 'error': 'Descripción requerida'}), 400
+        
+        # Crear proyecto temporal para predicción
+        project_data = {
+            'description': description,
+            'progress': progress,
+            'created_at': created_at
+        }
+        
+        # Usar la función de predicción existente
+        from ml_model_multiclass import predict_project
+        result = predict_project(project_data)
+        
+        return jsonify({'success': True, 'result': result})
+        
+    except FileNotFoundError:
+        return jsonify({
+            'success': False, 
+            'error': 'Modelo no encontrado. Debes entrenar el modelo primero cargando un dataset.'
+        }), 400
+    except Exception as e:
+        print(f"Error en api_predict_ml_test: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/emprendedor/entrenar_modelo_ml', methods=['POST'])
+def emprendedor_entrenar_modelo_ml():
+    """Permite al emprendedor entrenar el modelo con su propio CSV"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        # Verificar que se haya subido un archivo
+        if 'dataset' not in request.files:
+            return jsonify({'success': False, 'error': 'No se proporcionó archivo'}), 400
+        
+        file = request.files['dataset']
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No se seleccionó archivo'}), 400
+        
+        if not file.filename.endswith('.csv'):
+            return jsonify({'success': False, 'error': 'El archivo debe ser CSV'}), 400
+        
+        # Guardar temporalmente el archivo
+        import tempfile
+        import os
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix='.csv', delete=False) as tmp:
+            file.save(tmp.name)
+            tmp_path = tmp.name
+        
+        try:
+            # Entrenar el modelo
+            from ml_model_multiclass import train_model
+            model_path = train_model(tmp_path)
+            
+            # Registrar actividad
+            from app import registrar_actividad
+            registrar_actividad(session['user_id'], "Entrenó el modelo ML con dataset personalizado")
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Modelo entrenado exitosamente',
+                'model_path': model_path
+            })
+        finally:
+            # Limpiar archivo temporal
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+                
+    except Exception as e:
+        print(f"Error en emprendedor_entrenar_modelo_ml: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/emprendedor/descargar_dataset_ml_ejemplo')
+def emprendedor_descargar_dataset_ml_ejemplo():
+    """Descarga un dataset de ejemplo para entrenar"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        flash('No tienes permiso para acceder a esta sección', 'error')
+        return redirect(url_for('login'))
+    
+    # Crear CSV de ejemplo en memoria con datos más diferenciados
+    import io
+    output = io.StringIO()
+    
+    # Escribir con encoding UTF-8
+    output.write('description,progress,created_at,outcome\n')
+    
+    # Bajo éxito - Proyectos iniciales sin avance (sin acentos)
+    output.write('"Idea para emprendimiento de comida, aun en fase de exploracion sin validacion",10,2025-10-30,Bajo exito\n')
+    output.write('"Proyecto inicial sin desarrollo, solo investigacion de mercado",5,2025-11-01,Bajo exito\n')
+    output.write('"Emprendimiento personal sin equipo ni recursos asignados",15,2025-10-25,Bajo exito\n')
+    output.write('"Concepto basico sin prototipo ni clientes",8,2025-10-28,Bajo exito\n')
+    
+    # Medio éxito - Proyectos en desarrollo (sin acentos)
+    output.write('"Aplicacion movil en desarrollo con equipo formado y primeras pruebas",45,2025-09-15,Medio exito\n')
+    output.write('"Prototipo funcional en testing con feedback inicial de usuarios",55,2025-09-10,Medio exito\n')
+    output.write('"Modelo de negocio definido, buscando financiamiento inicial",60,2025-08-20,Medio exito\n')
+    output.write('"Producto minimo viable desarrollado, iniciando validacion comercial",50,2025-09-05,Medio exito\n')
+    
+    # Alto éxito - Proyectos avanzados (sin acentos)
+    output.write('"Plataforma con 100+ usuarios activos y ingresos recurrentes mensuales",85,2025-07-01,Alto exito\n')
+    output.write('"Startup con ronda de inversion cerrada y crecimiento mensual del 20%",90,2025-06-15,Alto exito\n')
+    output.write('"Producto validado con clientes pagantes y equipo de 10 personas",80,2025-07-20,Alto exito\n')
+    output.write('"Empresa establecida con ventas recurrentes y expansion a nuevos mercados",95,2025-05-10,Alto exito\n')
+    output.write('"SaaS con 500+ clientes activos y tasa de retencion del 85%",88,2025-06-01,Alto exito\n')
+    
+    # Convertir a bytes con UTF-8
+    output.seek(0)
+    csv_content = output.getvalue().encode('utf-8')
+    
+    from app import registrar_actividad
+    registrar_actividad(session['user_id'], "Descargó dataset de ejemplo")
+    
+    return Response(
+        csv_content,
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': 'attachment; filename=dataset_ejemplo.csv'}
+    )
+# ...existing code...
+@app.route('/emprendedor/reentrenar_modelo')
+def emprendedor_reentrenar_modelo():
+    """Reentrena el modelo con el dataset de ejemplo por defecto"""
+    if 'user_id' not in session or session.get('rol') != 'Emprendedor':
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        # Crear dataset temporal con casos muy diferenciados
+        import tempfile
+        import os
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8') as tmp:
+            # Escribir dataset de ejemplo con casos extremos
+            tmp.write('description,progress,created_at,outcome\n')
+            
+            # BAJO ÉXITO - Muy claro
+            tmp.write('"Idea inicial sin desarrollo",3,2025-11-10,Bajo exito\n')
+            tmp.write('"Concepto basico exploratorio sin equipo",8,2025-11-08,Bajo exito\n')
+            tmp.write('"Investigacion de mercado sin prototipo",12,2025-11-05,Bajo exito\n')
+            
+            # MEDIO ÉXITO - Desarrollo visible
+            tmp.write('"Prototipo funcional con 20 usuarios de prueba y feedback positivo",55,2025-09-20,Medio exito\n')
+            tmp.write('"MVP desarrollado, equipo formado, buscando financiamiento",60,2025-09-10,Medio exito\n')
+            tmp.write('"Aplicacion en testing con modelo de negocio definido",50,2025-09-25,Medio exito\n')
+            
+            # ALTO ÉXITO - Tracción comprobada
+            tmp.write('"500 clientes activos generando $50K MRR con crecimiento del 25% mensual",92,2025-06-01,Alto exito\n')
+            tmp.write('"Startup con funding de $2M, 15 empleados, mercado validado",88,2025-07-01,Alto exito\n')
+            tmp.write('"Producto con 5000 usuarios activos e ingresos recurrentes establecidos",90,2025-06-15,Alto exito\n')
+            
+            tmp_path = tmp.name
+        
+        try:
+            # Entrenar el modelo
+            from ml_model_multiclass import train_model
+            model_path = train_model(tmp_path)
+            
+            # Registrar actividad
+            registrar_actividad(session['user_id'], "Reentreno el modelo ML")
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Modelo reentrenado exitosamente con datos mejor diferenciados'
+            })
+        finally:
+            # Limpiar archivo temporal
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+                
+    except Exception as e:
+        print(f"Error en reentrenar_modelo: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+# ...existing code...
+
 # --- RUTA VISUAL PARA ENTRENAR EL MODELO (desde el panel del admin) ---
 @app.route('/admin/train_model', methods=['GET'])
 def admin_train_model():
@@ -2202,6 +2553,31 @@ def normalize_proyectos(raw_proyectos):
         }
         normalized.append(proj)
     return normalized
+
+@app.route('/debug/model_status')
+def debug_model_status():
+    """Ruta temporal para debug del modelo"""
+    try:
+        from ml_model_multiclass import load_model
+        model = load_model()
+        if model:
+            return jsonify({
+                'success': True,
+                'message': 'Modelo cargado correctamente',
+                'model_exists': True
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Modelo no encontrado',
+                'model_exists': False
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error: {str(e)}',
+            'model_exists': False
+        })
 
 
 if __name__ == '__main__':
