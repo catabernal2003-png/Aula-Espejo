@@ -16,12 +16,13 @@ app.secret_key = 'tu_clave_secreta_aqui'
 
 # Configuración para XAMPP
 DB_CONFIG = {
-    'host': 'shortline.proxy.rlwy.net',
-    'port': 59135,
-    'user': 'root',
-    'password': 'thFrJkBkQaQoPGGEHInZUmupLHFxCGLg',
-    'database': 'startpnjr'
+    'host': os.environ.get('DB_HOST', 'shortline.proxy.rlwy.net'),
+    'port': int(os.environ.get('DB_PORT', 59135)),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD', 'thFrJkBkQaQoPGGEHInZUmupLHFxCGLg'),
+    'database': os.environ.get('DB_NAME', 'startpnjr')
 }
+
 
 def get_db_connection():
     try:
